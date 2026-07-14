@@ -3,77 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KidsOS 🌌 - Virtual Web Operating System</title>
-    <!-- Tailwind CSS -->
+    <title>NebulaOS 🌌 - Virtual Web Operating System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    backdropBlur: {
-                        xs: '2px',
-                    },
                     colors: {
-                        nebula: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            800: '#1e1b4b',
-                            900: '#311042',
-                            950: '#0f051d'
-                        }
+                        nebula: { 50: '#f5f3ff', 800: '#1e1b4b', 900: '#311042', 950: '#0f051d' }
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .font-code {
-            font-family: 'Fira Code', monospace;
-        }
-
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 5, 29, 0.3);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(168, 85, 247, 0.4);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(168, 85, 247, 0.7);
-        }
-        
-        .no-select {
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        /* CRT/Scanline Overlays */
-        .scanline::after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 9999;
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
-        }
-
-        /* Glassmorphic Window Styling */
+    <style id="dynamic-glass-style">
         .glass-window {
             background: rgba(18, 12, 38, 0.85);
             backdrop-filter: blur(20px);
@@ -81,81 +26,129 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
         }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
+    </style>
+    <style id="dynamic-accent-style">
+        .accent-border { border-color: rgba(168, 85, 247, 0.75) !important; }
+        .accent-bg { background-color: #a855f7 !important; }
+        .accent-text { color: #c084fc !important; }
+        .accent-shadow { box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.3) !important; }
+    </style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-code { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 5, 29, 0.3); }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.7); }
+        .no-select { user-select: none; -webkit-user-select: none; }
+        .scanline::after {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 9999; background-size: 100% 3px, 3px 100%; pointer-events: none;
         }
-        
-        /* Floating animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
     </style>
 </head>
 <body class="h-full w-full overflow-hidden text-gray-100 bg-nebula-950 no-select">
 
-    <!-- SCANLINE CRT VIBE -->
-    <div class="scanline absolute inset-0 pointer-events-none z-50"></div>
+    <div id="scanline-overlay" class="scanline absolute inset-0 pointer-events-none z-50"></div>
 
     <!-- ================= SYSTEM BOOT SCREEN ================= -->
-    <div id="boot-screen" class="absolute inset-0 bg-black z-[9999] flex flex-col items-center justify-center font-mono p-6">
+    <div id="boot-screen" class="absolute inset-0 bg-black z-[9999] flex flex-col items-center justify-center font-code p-6 transition-opacity duration-500">
         <div class="max-w-lg w-full text-green-400 text-xs md:text-sm space-y-2">
             <p class="text-purple-400 font-bold text-lg md:text-xl">NEBULA_OS v4.0.0_ULTRA 🚀</p>
             <p>===========================================</p>
-            <p id="boot-log-1">> INITIALIZING SYSTEM MEMORY...</p>
-            <p id="boot-log-2" class="hidden">> LOADING DRIVERS [OK]</p>
-            <p id="boot-log-3" class="hidden">> MOUNTING VIRTUAL FILE SYSTEM (VFS) [OK]</p>
-            <p id="boot-log-4" class="hidden">> BOOTING GOOGLE SEARCH GROUNDING CORES [CONNECTED]</p>
-            <p id="boot-log-5" class="hidden">> INITIALIZING DOCK & DESKTOP SUITE...</p>
+            <p id="boot-log-1">> INITIALIZING KERNEL MEMORY...</p>
+            <p id="boot-log-2" class="hidden">> LOADING UI SUBSYSTEMS [OK]</p>
+            <p id="boot-log-3" class="hidden">> SECURING AUTHENTICATION GATEWAY [OK]</p>
             <div id="boot-progress-bar" class="w-full bg-neutral-900 h-2 rounded border border-green-800 overflow-hidden mt-4 hidden">
                 <div class="bg-gradient-to-r from-green-500 to-purple-500 h-full w-0 transition-all duration-300" id="boot-progress"></div>
             </div>
-            <button id="boot-btn" class="hidden mt-6 px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded shadow-lg shadow-purple-500/30 transition-all active:scale-95 text-sm uppercase tracking-wider">
-                🌌 Connect & Boot
-            </button>
+        </div>
+    </div>
+
+    <!-- ================= LOGIN / SIGN UP SCREEN ================= -->
+    <div id="login-screen" class="absolute inset-0 z-[9990] hidden flex-col items-center justify-center bg-cover bg-center transition-opacity duration-700" style="background-image: radial-gradient(circle at center, #1b0e3d 0%, #080314 100%);">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div class="glass-window p-8 rounded-3xl w-full max-w-sm z-10 flex flex-col items-center border border-white/20 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+            
+            <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-4xl shadow-inner shadow-black/50 mb-4 animate-float border-2 border-white/10">
+                👽
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-1 tracking-tight" id="login-title">Welcome Back</h2>
+            <p class="text-xs text-gray-400 mb-6" id="login-subtitle">Authenticate to access NebulaOS</p>
+            
+            <!-- Login Form -->
+            <div id="form-login" class="w-full space-y-4">
+                <div>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-1 mb-1 block">Select Profile</label>
+                    <select id="login-user-select" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-purple-500 appearance-none cursor-pointer">
+                        <option value="Administrator">Administrator</option>
+                        <option value="Nebula Guest" selected>Nebula Guest</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-1 mb-1 block">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password (if required)" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-purple-500 transition-colors">
+                </div>
+                <button id="btn-login-submit" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-all">Log In</button>
+                <div class="text-center mt-4">
+                    <button id="btn-show-signup" class="text-xs text-purple-400 hover:text-purple-300 font-medium transition-colors">Create new account &rarr;</button>
+                </div>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="form-signup" class="w-full space-y-4 hidden">
+                <div>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-1 mb-1 block">New Username</label>
+                    <input type="text" id="signup-username" placeholder="e.g. Commander Shepard" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-pink-500 transition-colors">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-1 mb-1 block">New Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a secure password" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-pink-500 transition-colors">
+                </div>
+                <button id="btn-signup-submit" class="w-full py-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 rounded-xl font-bold text-white shadow-lg shadow-pink-500/20 active:scale-95 transition-all">Sign Up & Boot</button>
+                <div class="text-center mt-4">
+                    <button id="btn-show-login" class="text-xs text-gray-400 hover:text-white font-medium transition-colors">&larr; Back to Login</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- ================= MAIN DESKTOP ENVIRONMENT ================= -->
     <div id="desktop-env" class="hidden h-full w-full flex flex-col relative bg-cover bg-center transition-all duration-700" style="background-image: radial-gradient(circle at center, #1b0e3d 0%, #080314 100%);">
-        
-        <!-- Interactive Gradient Aurora Overlay -->
         <div class="absolute inset-0 bg-gradient-to-tr from-purple-900/10 via-transparent to-pink-900/10 pointer-events-none mix-blend-color-dodge"></div>
-
-        <!-- Notification Feed Stack -->
         <div id="notification-area" class="absolute top-4 right-4 z-[999] flex flex-col gap-2 max-w-sm pointer-events-auto"></div>
 
-        <!-- Desktop Shortcuts Area -->
-        <div id="desktop-grid" class="flex-1 p-4 md:p-6 grid grid-flow-row grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 items-start content-start relative overflow-hidden">
-            <!-- Shortcuts populated dynamically -->
+        <div id="desktop-grid" class="flex-1 p-4 md:p-6 grid grid-flow-row grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 items-start content-start relative overflow-hidden"></div>
+
+        <!-- Right-Click Context Menu -->
+        <div id="desktop-context-menu" class="hidden absolute bg-neutral-900/95 backdrop-blur-md border border-white/10 rounded-xl p-1.5 shadow-2xl z-[1000] w-48 text-sm text-gray-200">
+            <button id="ctx-add-folder" class="w-full text-left px-3 py-2 hover:bg-white/10 rounded-lg flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-folder-plus text-yellow-500"></i> Add Folder
+            </button>
+            <button id="ctx-open-terminal" class="w-full text-left px-3 py-2 hover:bg-white/10 rounded-lg flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-terminal text-green-400"></i> Open Terminal
+            </button>
         </div>
 
-        <!-- ================= TASKBAR / DOCK ================= -->
+        <!-- Taskbar -->
         <div class="h-14 bg-black/60 backdrop-blur-md border-t border-white/10 flex items-center justify-between px-3 md:px-6 relative z-[500] select-none">
-            <!-- Start button & Search -->
-            <div class="flex items-center gap-2">
-                <button id="start-menu-trigger" class="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-lg text-white font-semibold text-sm transition-all shadow-lg shadow-purple-500/20 active:scale-95">
+            <div class="flex items-center gap-2 flex-1 overflow-hidden">
+                <button id="start-menu-trigger" class="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-lg text-white font-semibold text-sm transition-all shadow-lg shadow-purple-500/20 active:scale-95 shrink-0">
                     <span>🌌</span> <span class="hidden sm:inline">Nebula</span>
                 </button>
-                <div class="hidden md:flex items-center bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs gap-1.5">
+                <div class="hidden md:flex items-center bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs gap-1.5 shrink-0">
                     <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
                     <input id="quick-search" type="text" placeholder="Search system... 🔍" class="bg-transparent border-none outline-none text-white placeholder-gray-400 w-32 focus:w-48 transition-all">
                 </div>
+                <div class="w-px h-6 bg-white/10 mx-1 hidden sm:block shrink-0"></div>
+                <div id="taskbar-apps" class="flex items-center gap-1.5 overflow-x-auto scrollbar-none px-2 py-1 flex-1"></div>
             </div>
-
-            <!-- Active App Badges -->
-            <div id="taskbar-apps" class="flex items-center gap-1.5 overflow-x-auto max-w-md sm:max-w-xl md:max-w-2xl scrollbar-none px-2 py-1">
-                <!-- Badges go here -->
-            </div>
-
-            <!-- System Info / Tray -->
-            <div class="flex items-center gap-3 text-xs text-gray-300 font-mono">
+            <div class="flex items-center gap-3 text-xs text-gray-300 font-mono shrink-0 pl-2">
                 <div class="hidden sm:flex items-center gap-2 border-r border-white/10 pr-3">
                     <i id="sys-wifi-icon" class="fa-solid fa-wifi text-green-400 cursor-pointer hover:text-white transition-all" title="System Connection: Excellent 📶"></i>
                     <i id="sys-battery-icon" class="fa-solid fa-battery-three-quarters text-purple-400 cursor-pointer hover:text-white transition-all" title="Battery: 92% 🔋"></i>
@@ -167,79 +160,51 @@
             </div>
         </div>
 
-        <!-- ================= START MENU ================= -->
+        <!-- Start Menu -->
         <div id="start-menu" class="hidden absolute bottom-16 left-4 w-80 max-w-[calc(100vw-2rem)] bg-neutral-950/95 backdrop-blur-xl border border-white/15 rounded-2xl p-5 shadow-2xl shadow-black/80 z-[600] flex flex-col gap-4">
-            <!-- User profile header -->
             <div id="user-profile-header" class="flex items-center gap-3 border-b border-white/10 pb-4 cursor-pointer hover:bg-white/5 rounded-xl p-2 transition-colors -mx-2 -mt-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-xl shadow-inner font-bold text-white">
-                    👽
-                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-xl shadow-inner font-bold text-white">👽</div>
                 <div>
-                    <h3 id="start-profile-name" class="font-bold text-sm text-white">Nebula Guest 🚀</h3>
+                    <h3 id="start-profile-name" class="font-bold text-sm text-white">Guest 🚀</h3>
                     <p class="text-[11px] text-purple-400">Status: Explorer level 12</p>
                 </div>
             </div>
-            
-            <!-- Quick System Specs -->
-            <div class="grid grid-cols-2 gap-2 text-xs bg-white/5 rounded-xl p-3 border border-white/5 font-mono">
-                <div>
-                    <span class="text-gray-400">OS Node:</span> <span class="text-green-400">N-4.0</span>
-                </div>
-                <div>
-                    <span class="text-gray-400">API:</span> <span class="text-indigo-400">Grounded 🤖</span>
-                </div>
+            <div class="grid grid-cols-2 gap-2 text-xs bg-white/5 rounded-xl p-3 border border-white/5 font-code">
+                <div><span class="text-gray-400">OS Node:</span> <span class="text-green-400">N-4.0</span></div>
+                <div><span class="text-gray-400">API:</span> <span class="text-indigo-400">Grounded 🤖</span></div>
                 <div class="col-span-2 mt-1">
-                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-purple-500 h-full w-[48%]"></div>
-                    </div>
+                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden"><div class="bg-purple-500 h-full w-[48%]"></div></div>
                     <p class="text-[9px] text-gray-500 mt-1">V-RAM: 3.8 GB / 8.0 GB</p>
                 </div>
             </div>
-
-            <!-- Start Menu App Categories -->
             <div class="space-y-1">
                 <p class="text-[10px] text-gray-500 uppercase font-semibold tracking-wider px-1">All Applications</p>
-                <div id="start-menu-apps-list" class="max-h-56 overflow-y-auto space-y-0.5 pr-1">
-                    <!-- Populated dynamically -->
-                </div>
+                <div id="start-menu-apps-list" class="max-h-56 overflow-y-auto space-y-0.5 pr-1"></div>
             </div>
-
-            <!-- Power Controls -->
             <div class="flex items-center justify-between border-t border-white/10 pt-3 text-xs">
-                <button id="lock-screen-btn" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-300 transition-colors">
-                    <i class="fa-solid fa-lock text-yellow-500"></i> Lock Sys
-                </button>
-                <button id="reboot-os-btn" class="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/50 hover:bg-red-900/40 text-red-300 rounded-lg border border-red-900/30 transition-colors">
-                    <i class="fa-solid fa-power-off text-red-500"></i> Restart 🔄
-                </button>
+                <button id="lock-screen-btn" class="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-gray-300 transition-colors"><i class="fa-solid fa-lock text-yellow-500"></i> Log Out</button>
+                <button id="reboot-os-btn" class="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/50 hover:bg-red-900/40 text-red-300 rounded-lg border border-red-900/30 transition-colors"><i class="fa-solid fa-power-off text-red-500"></i> Restart 🔄</button>
             </div>
         </div>
-
     </div>
 
-    <!-- ================= FLOATING WINDOW TEMPLATE (FOR CLONING) ================= -->
+    <!-- Window Template -->
     <div id="window-template" class="hidden absolute rounded-xl glass-window flex flex-col overflow-hidden min-w-[320px] min-h-[220px] select-none transition-all duration-100" style="z-index: 100;">
         <div class="window-header h-10 bg-neutral-950/95 px-3 flex items-center justify-between border-b border-white/5 cursor-move text-xs select-none">
-            <div class="flex items-center gap-2 font-semibold">
-                <span class="window-icon text-sm">📂</span>
-                <span class="window-title text-gray-200">New Window</span>
-            </div>
+            <div class="flex items-center gap-2 font-semibold"><span class="window-icon text-sm">📂</span><span class="window-title text-gray-200">New Window</span></div>
             <div class="flex items-center gap-2">
-                <button class="win-btn-min w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors" title="Minimize"></button>
-                <button class="win-btn-max w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors" title="Maximize"></button>
-                <button class="win-btn-close w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors flex items-center justify-center text-[8px] text-red-950" title="Close">×</button>
+                <button class="win-btn-min w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors"></button>
+                <button class="win-btn-max w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors"></button>
+                <button class="win-btn-close w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors flex items-center justify-center text-[8px] text-red-950">×</button>
             </div>
         </div>
         <div class="window-content flex-1 overflow-auto bg-neutral-900/40 text-gray-200"></div>
         <div class="window-resize-handle absolute bottom-0 right-0 w-4 h-4 cursor-se-resize flex items-end justify-end p-0.5 pointer-events-auto">
-            <svg width="8" height="8" viewBox="0 0 8 8" class="text-white/30 fill-current">
-                <line x1="6" y1="0" x2="6" y2="6" stroke="currentColor" stroke-width="1.5"/>
-                <line x1="0" y1="6" x2="6" y2="6" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
+            <svg width="8" height="8" viewBox="0 0 8 8" class="text-white/30 fill-current"><line x1="6" y1="0" x2="6" y2="6" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="6" x2="6" y2="6" stroke="currentColor" stroke-width="1.5"/></svg>
         </div>
     </div>
 
-    <!-- ================= SYSTEM DIALOG MODAL DIALOGS (ALERT / PROMPT) ================= -->
+    <!-- Dialog Modal -->
     <div id="system-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] hidden flex items-center justify-center pointer-events-auto">
         <div class="glass-window p-6 rounded-2xl w-96 max-w-[90%] shadow-2xl border border-white/20 transform scale-95 transition-transform" id="modal-box">
             <h3 id="modal-title" class="text-xl font-bold mb-2 text-white">Title</h3>
@@ -252,27 +217,17 @@
         </div>
     </div>
 
-
-    <!-- ================= APP VIEW TEMPLATES ================= -->
-
-    
-    <!-- Gemini AI Assistant -->
+    <!-- App Templates -->
     <template id="app-gemini-ai">
         <div class="flex flex-col h-full bg-neutral-900/90 font-sans">
             <div class="bg-neutral-950 px-3 py-2 border-b border-white/5 flex items-center justify-between text-xs text-gray-400">
-                <div class="flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                    <span>Gemini Core Active</span>
-                </div>
+                <div class="flex items-center gap-2"><span class="inline-block w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span><span>Gemini Core Active</span></div>
                 <button class="clear-ai-chat hover:text-white transition-colors"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="chat-logs flex-1 overflow-y-auto p-4 space-y-4 text-sm">
                 <div class="flex gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
                     <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white"><i class="fa-solid fa-robot"></i></div>
-                    <div>
-                        <h4 class="font-bold text-indigo-400 text-xs">Nebula AI Core</h4>
-                        <p class="mt-1 text-gray-200">Greetings, traveler. I can help configure your environment, output code matrices, or synthesize ideas! 🌌</p>
-                    </div>
+                    <div><h4 class="font-bold text-indigo-400 text-xs">Nebula AI Core</h4><p class="mt-1 text-gray-200">Greetings. I am integrated with Google's API natively! 🌌</p></div>
                 </div>
             </div>
             <form class="ai-chat-form p-3 border-t border-white/10 flex items-center gap-2 bg-neutral-950">
@@ -282,11 +237,10 @@
         </div>
     </template>
 
-    <!-- Imagen Art Studio -->
     <template id="app-imagen-studio">
         <div class="flex flex-col h-full bg-neutral-900/90">
             <div class="p-4 border-b border-white/10 space-y-3">
-                <p class="text-xs text-gray-400">Powered by Imagen 4.0 Art Synthesis. Specify art directives to save straight to NebulaOS drawings folders.</p>
+                <p class="text-xs text-gray-400">Powered by Imagen. Specify art directives to save straight to NebulaOS drawings folders.</p>
                 <form class="imagen-generator-form flex gap-2">
                     <input type="text" placeholder="Cyberpunk astronauts on Mars neon sketch..." class="imagen-input flex-1 bg-white/5 border border-white/15 focus:border-pink-500 rounded-xl px-3 py-2 text-xs text-white outline-none">
                     <button type="submit" class="px-4 py-2 bg-pink-600 hover:bg-pink-500 rounded-xl font-bold text-xs">🪄 Create</button>
@@ -295,24 +249,22 @@
             <div class="flex-1 overflow-auto bg-neutral-950 flex flex-col items-center justify-center p-4 relative">
                 <div class="imagen-loader absolute inset-0 bg-black/80 z-10 flex flex-col items-center justify-center gap-2 hidden">
                     <div class="w-10 h-10 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-xs text-pink-300 font-mono tracking-widest animate-pulse">SYNTHESIZING ARTWORK...</p>
+                    <p class="text-xs text-pink-300 font-code tracking-widest animate-pulse">SYNTHESIZING...</p>
                 </div>
                 <div class="imagen-preview-container max-w-sm w-full border border-white/10 rounded-2xl overflow-hidden shadow-2xl relative group bg-neutral-900/50 flex flex-col items-center justify-center min-h-[220px]">
                     <div class="imagen-placeholder-info text-center p-6 text-gray-500">
-                        <i class="fa-regular fa-image text-3xl mb-2 text-gray-600"></i>
-                        <p class="text-xs">Your artwork will display here 🎨</p>
+                        <i class="fa-regular fa-image text-3xl mb-2 text-gray-600"></i><p class="text-xs">Your artwork will display here 🎨</p>
                     </div>
                     <img src="" class="imagen-output-img w-full h-auto object-cover hidden">
                 </div>
             </div>
             <div class="p-3 border-t border-white/5 bg-neutral-950 flex items-center justify-between text-xs">
                 <button class="imagen-save-to-vfs px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 hidden">💾 Save to Sketches</button>
-                <p class="text-[10px] text-gray-500">Unbounded creative sandbox.</p>
+                <p class="text-[10px] text-gray-500">Sandbox Active.</p>
             </div>
         </div>
     </template>
 
-    <!-- Interactive Terminal -->
     <template id="app-terminal">
         <div class="flex flex-col h-full bg-black text-green-400 font-code text-xs p-3 select-text">
             <div class="flex-1 overflow-y-auto space-y-2 terminal-history scroll-smooth">
@@ -320,34 +272,28 @@
                 <p class="text-gray-500">Type "help" to list valid kernel directives.</p>
             </div>
             <div class="flex items-center gap-1 border-t border-green-950/60 pt-2 shrink-0">
-                <span class="text-pink-500">User@kids-os:~$</span>
+                <span class="text-pink-500">guest@nebula-os:~$</span>
                 <input type="text" class="terminal-input bg-transparent border-none outline-none text-green-300 flex-1 font-code focus:ring-0">
             </div>
         </div>
     </template>
 
-    <!-- Notepad App -->
     <template id="app-notepad">
         <div class="flex flex-col h-full bg-neutral-900/90 select-text">
             <div class="bg-neutral-950 px-3 py-1.5 border-b border-white/5 flex items-center justify-between text-xs text-gray-400">
                 <div class="flex gap-3">
                     <button class="notepad-new hover:text-white transition-colors">📄 New</button>
                     <button class="notepad-save hover:text-white transition-colors">💾 Save</button>
-                    <button class="notepad-export hover:text-white transition-colors">📥 Export</button>
                 </div>
-                <div class="text-[10px] text-gray-500">
-                    File: <span class="notepad-filename text-gray-300">untitled.txt</span>
-                </div>
+                <div class="text-[10px] text-gray-500">File: <span class="notepad-filename text-gray-300">untitled.txt</span></div>
             </div>
             <textarea class="notepad-textarea flex-1 p-4 bg-transparent text-gray-100 outline-none resize-none text-sm font-code focus:ring-0 border-none" placeholder="Start typing system notes... 📝"></textarea>
             <div class="bg-neutral-950 border-t border-white/5 px-4 py-1 text-[10px] text-gray-500 flex justify-between select-none">
-                <span class="notepad-char-count">0 characters</span>
-                <span>Virtual File Storage Integration (Docs)</span>
+                <span class="notepad-char-count">0 characters</span><span>VFS Active</span>
             </div>
         </div>
     </template>
 
-    <!-- Paint App -->
     <template id="app-paint">
         <div class="flex flex-col h-full bg-neutral-900/90">
             <div class="bg-neutral-950 p-2 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -366,525 +312,509 @@
             </div>
             <div class="bg-neutral-950 px-3 py-1.5 border-t border-white/5 flex items-center justify-between text-[11px] text-gray-500">
                 <span>Hold mouse/tap to draw!</span>
-                <button class="paint-save-to-vfs px-2.5 py-1 bg-purple-900/40 text-purple-200 border border-purple-800/40 rounded-md flex items-center gap-1">💾 Save to Sketches</button>
+                <button class="paint-save-to-vfs px-2.5 py-1 bg-purple-900/40 text-purple-200 border border-purple-800/40 rounded-md">💾 Save to Sketches</button>
             </div>
         </div>
     </template>
 
-    <!-- Calculator App -->
-    <template id="app-calculator">
-        <div class="h-full bg-neutral-950 p-4 flex flex-col justify-between max-w-xs mx-auto select-none">
-            <div class="bg-black/50 border border-white/10 rounded-xl p-3 text-right font-code mb-4 flex flex-col justify-end h-20 overflow-hidden">
-                <div class="calc-history text-[11px] text-gray-500 h-5 overflow-hidden"></div>
-                <div class="calc-screen text-2xl font-bold text-white whitespace-nowrap">0</div>
-            </div>
-            <div class="grid grid-cols-4 gap-2 flex-1">
-                <button class="calc-btn px-4 py-3 bg-red-950/40 hover:bg-red-900/30 text-red-400 rounded-xl font-bold" data-action="clear">C</button>
-                <button class="calc-btn px-4 py-3 bg-white/5 rounded-xl font-bold text-purple-400" data-action="operator" data-val="/">/</button>
-                <button class="calc-btn px-4 py-3 bg-white/5 rounded-xl font-bold text-purple-400" data-action="operator" data-val="*">*</button>
-                <button class="calc-btn px-4 py-3 bg-white/5 rounded-xl font-bold text-purple-400" data-action="operator" data-val="-">-</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="7">7</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="8">8</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="9">9</button>
-                <button class="calc-btn px-4 py-3 bg-white/5 rounded-xl font-bold text-purple-400 row-span-2 flex items-center justify-center" data-action="operator" data-val="+">+</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="4">4</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="5">5</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="6">6</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="1">1</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="2">2</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val="3">3</button>
-                <button class="calc-btn px-4 py-3 bg-purple-600 rounded-xl font-bold text-white row-span-2 flex items-center justify-center" data-action="equals">=</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold col-span-2" data-val="0">0</button>
-                <button class="calc-btn px-4 py-3 bg-white/10 rounded-xl font-bold" data-val=".">.</button>
-            </div>
-        </div>
-    </template>
-
-    <!-- File Explorer App -->
     <template id="app-explorer">
         <div class="flex h-full bg-neutral-900/95 font-sans">
-            <div class="w-36 bg-neutral-950 border-r border-white/5 p-3 flex flex-col gap-2 text-xs shrink-0">
-                <span class="text-gray-500 font-bold uppercase tracking-widest text-[9px] mb-2">Virtual Disk</span>
-                <button class="explorer-dir-btn w-full text-left px-2 py-1.5 bg-white/5 text-white border-l-2 border-purple-500 rounded-r-md flex items-center gap-1.5" data-dir="/">
-                    <span>🏠</span> Root
-                </button>
-                <button class="explorer-dir-btn w-full text-left px-2 py-1.5 hover:bg-white/5 text-gray-300 rounded-md flex items-center gap-1.5" data-dir="/docs">
-                    <span>📂</span> Documents
-                </button>
-                <button class="explorer-dir-btn w-full text-left px-2 py-1.5 hover:bg-white/5 text-gray-300 rounded-md flex items-center gap-1.5" data-dir="/drawings">
-                    <span>🎨</span> Sketches
-                </button>
-            </div>
+            <div class="explorer-sidebar w-36 bg-neutral-950 border-r border-white/5 p-3 flex flex-col gap-2 text-xs shrink-0 overflow-y-auto"></div>
             <div class="flex-1 flex flex-col overflow-hidden">
                 <div class="bg-neutral-950 p-2 border-b border-white/5 flex items-center justify-between text-xs text-gray-400">
-                    <div class="flex items-center gap-1">
-                        <span>Directory:</span>
-                        <span class="explorer-curr-dir font-code text-purple-400 text-[11px] bg-white/5 px-2 py-0.5 rounded">/</span>
-                    </div>
+                    <div class="flex items-center gap-1"><span>Directory:</span><span class="explorer-curr-dir font-code text-purple-400 text-[11px] bg-white/5 px-2 py-0.5 rounded">/</span></div>
                 </div>
-                <div class="explorer-files-grid flex-1 p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 items-start content-start overflow-y-auto">
-                    <!-- Dynamic Files Grid -->
-                </div>
+                <div class="explorer-files-grid flex-1 p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 items-start content-start overflow-y-auto"></div>
             </div>
         </div>
     </template>
 
-    <!-- Settings & Personalization -->
-    <template id="app-settings">
-        <div class="flex h-full bg-neutral-900/95 font-sans">
-            <!-- Settings Sidebar -->
-            <div class="w-32 bg-neutral-950 border-r border-white/5 p-3 flex flex-col gap-2 text-xs shrink-0">
-                <span class="text-gray-500 font-bold uppercase tracking-widest text-[9px] mb-1">Control Panel</span>
-                <button class="settings-nav-btn w-full text-left px-2 py-2 bg-white/5 border-l-2 border-purple-500 text-white rounded-r-md flex items-center gap-1.5" data-tab="tab-theme">🎨 Personalize</button>
-                <button class="settings-nav-btn w-full text-left px-2 py-2 hover:bg-white/5 text-gray-400 rounded-md flex items-center gap-1.5" data-tab="tab-network">📶 Network</button>
-                <button class="settings-nav-btn w-full text-left px-2 py-2 hover:bg-white/5 text-gray-400 rounded-md flex items-center gap-1.5" data-tab="tab-accounts">👥 Accounts</button>
-            </div>
-            <div class="flex-1 p-5 overflow-y-auto space-y-6 text-sm">
-                <!-- Theme Tab -->
-                <div id="tab-theme" class="settings-tab-view space-y-4">
-                    <h3 class="font-bold text-white border-b border-white/10 pb-2">Personalize Desktop Wallpaper</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button class="settings-theme-btn border-2 border-purple-500 rounded-xl overflow-hidden shadow-lg h-16 bg-gradient-to-tr from-indigo-950 via-purple-950 to-neutral-950 flex items-center justify-center font-bold text-xs text-purple-300" data-gradient="radial-gradient(circle at center, #1b0e3d 0%, #080314 100%)">Deep Cosmos</button>
-                        <button class="settings-theme-btn border border-white/10 rounded-xl overflow-hidden h-16 bg-gradient-to-tr from-sky-950 via-slate-900 to-neutral-950 flex items-center justify-center font-bold text-xs text-sky-300" data-gradient="linear-gradient(135deg, #0f172a 0%, #020617 100%)">Midnight Slate</button>
-                        <button class="settings-theme-btn border border-white/10 rounded-xl overflow-hidden h-16 bg-gradient-to-tr from-emerald-950 to-neutral-950 flex items-center justify-center font-bold text-xs text-emerald-300" data-gradient="radial-gradient(circle at top right, #064e3b 0%, #022c22 40%, #020617 100%)">Aurora Nebula</button>
-                        <button class="settings-theme-btn border border-white/10 rounded-xl overflow-hidden h-16 bg-gradient-to-tr from-rose-950 via-neutral-900 to-black flex items-center justify-center font-bold text-xs text-rose-300" data-gradient="linear-gradient(135deg, #4c0519 0%, #09090b 100%)">Rose Gravity</button>
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                        <div>
-                            <p class="font-medium text-xs text-gray-200">System Sound FX</p>
-                            <p class="text-[10px] text-gray-500">Enable mechanical clicks & operations audio</p>
-                        </div>
-                        <input type="checkbox" id="settings-sound-toggle" class="w-9 h-5 bg-gray-200 rounded-full appearance-none checked:bg-purple-600 transition-colors relative cursor-pointer outline-none before:absolute before:content-[''] before:w-4 before:h-4 before:bg-white before:rounded-full before:top-[2px] before:left-[2px] checked:before:translate-x-4 before:transition-transform" checked>
-                    </div>
-                </div>
-
-                <!-- Network Tab -->
-                <div id="tab-network" class="settings-tab-view hidden space-y-4">
-                    <h3 class="font-bold text-white border-b border-white/10 pb-2">WiFi Configuration Simulator</h3>
-                    <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
-                        <div>
-                            <p id="settings-wifi-status" class="font-bold text-green-400">Connected</p>
-                            <p id="settings-wifi-ssid" class="text-xs text-gray-400">SSID: Nebula_Cosmos_Net</p>
-                        </div>
-                        <input type="checkbox" id="settings-wifi-toggle" class="w-9 h-5 bg-gray-200 rounded-full appearance-none checked:bg-purple-600 transition-colors relative cursor-pointer outline-none before:absolute before:content-[''] before:w-4 before:h-4 before:bg-white before:rounded-full before:top-[2px] before:left-[2px] checked:before:translate-x-4 before:transition-transform" checked>
-                    </div>
-                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-4">Available Networks Nearby</h4>
-                    <div id="settings-wifi-networks-list" class="space-y-1.5">
-                        <!-- Networks list loaded here -->
-                    </div>
-                </div>
-
-                <!-- Accounts Tab -->
-                <div id="tab-accounts" class="settings-tab-view hidden space-y-4">
-                    <div class="flex items-center justify-between border-b border-white/10 pb-2">
-                        <h3 class="font-bold text-white">Accounts Registry</h3>
-                        <button id="add-account-btn" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 rounded text-xs font-semibold">➕ Add Account</button>
-                    </div>
-                    <div id="settings-accounts-list" class="space-y-2">
-                        <!-- Accounts go here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
-
-
-    <!-- Cosmic Web Browser -->
     <template id="app-browser">
         <div class="flex flex-col h-full bg-neutral-900 select-text font-sans">
-            <!-- URL Controls -->
             <div class="bg-neutral-950 p-2.5 border-b border-white/10 flex items-center gap-2 text-xs shrink-0 select-none">
-                <div class="flex items-center gap-1.5">
-                    <button class="browser-home-btn p-1.5 hover:bg-white/5 rounded text-gray-400 hover:text-white"><i class="fa-solid fa-house"></i></button>
-                </div>
+                <button class="browser-home-btn p-1.5 hover:bg-white/5 rounded text-gray-400"><i class="fa-solid fa-house"></i></button>
                 <div class="flex-1 bg-white/5 border border-white/10 rounded-full px-3 py-1 flex items-center gap-2 text-gray-400">
                     <i class="fa-solid fa-lock text-[10px] text-green-400"></i>
                     <input type="text" value="https://google.engine.nebula" class="browser-url-input bg-transparent border-none outline-none text-white w-full text-xs" readonly>
                 </div>
-                <button class="browser-refresh-btn p-1.5 hover:bg-white/5 rounded text-gray-400 hover:text-white"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
-            <!-- Browser Body -->
             <div class="browser-body flex-1 overflow-auto bg-white text-neutral-900 p-4 flex flex-col relative min-h-[300px]">
-                <!-- Loading Screen -->
                 <div class="browser-loader absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center gap-3 hidden">
                     <div class="w-8 h-8 border-3 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-xs text-purple-600 font-semibold tracking-wide">Querying Google Grounding Engine...</p>
+                    <p class="text-xs text-purple-600 font-semibold">Querying Google Grounding Engine...</p>
                 </div>
-
-                <!-- Search Homepage Layout -->
                 <div class="browser-home-layout flex-1 flex flex-col items-center justify-center py-10 space-y-6">
-                    <div class="text-4xl sm:text-5xl font-bold tracking-tight select-none">
+                    <div class="text-4xl font-bold tracking-tight select-none">
                         <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-500">l</span><span class="text-red-500">e</span>
-                        <span class="text-[10px] font-mono bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded ml-1 border border-purple-200">Engine</span>
                     </div>
-                    <form class="browser-search-form w-full max-w-md flex items-center bg-white border border-gray-300 shadow-sm rounded-full px-4 py-2 hover:shadow-md transition-shadow select-none">
+                    <form class="browser-search-form w-full max-w-md flex items-center bg-white border border-gray-300 rounded-full px-4 py-2 hover:shadow-md transition-shadow">
                         <i class="fa-solid fa-magnifying-glass text-gray-400 mr-2"></i>
                         <input type="text" placeholder="Search the actual web..." class="browser-search-input flex-1 bg-transparent border-none outline-none text-sm text-neutral-800">
                         <button type="submit" class="hidden"></button>
                     </form>
-                    <div class="flex gap-2 text-xs select-none">
-                        <button class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-neutral-600">Google Search</button>
-                        <button class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-neutral-600">I'm Feeling Cosmic 🌌</button>
-                    </div>
                 </div>
-
-                <!-- Live Search Engine Results Layout -->
                 <div class="browser-results-layout flex-1 hidden flex-col max-w-2xl mx-auto w-full py-2 space-y-6">
-                    <div class="border-b pb-3 border-gray-100 select-none">
-                        <p class="text-xs text-gray-500">About 132,000 results (0.32 seconds)</p>
-                    </div>
-
-                    <!-- Gemini Grounded AI Summary Card (Answers Area) -->
                     <div class="bg-purple-50/70 border border-purple-100 rounded-2xl p-4 space-y-2 relative">
-                        <div class="absolute top-3 right-3 text-purple-600 select-none"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                        <h4 class="font-bold text-purple-900 text-xs tracking-wider uppercase">Grounded Engine Summary</h4>
-                        <div class="browser-grounded-summary text-sm leading-relaxed text-neutral-800 select-text"></div>
+                        <h4 class="font-bold text-purple-900 text-xs tracking-wider uppercase">Grounded Summary</h4>
+                        <div class="browser-grounded-summary text-sm leading-relaxed text-neutral-800"></div>
                     </div>
-
-                    <!-- Search Grounded Attributions / Authentic Links list -->
                     <div class="space-y-4">
-                        <h4 class="font-bold text-gray-800 text-sm select-none border-b border-gray-100 pb-1">Real-time Web Matches</h4>
-                        <div class="browser-grounded-links space-y-3">
-                            <!-- Linked results loaded here -->
-                        </div>
+                        <h4 class="font-bold text-gray-800 text-sm border-b border-gray-100 pb-1">Web Matches</h4>
+                        <div class="browser-grounded-links space-y-3"></div>
                     </div>
                 </div>
-            </div>
-            <div class="bg-neutral-950 p-2 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500 select-none">
-                <span>Integrated Gemini Grounding Network Active</span>
-                <span>Safe Sandbox</span>
             </div>
         </div>
     </template>
 
-
-    <!-- Weather App -->
     <template id="app-weather">
         <div class="h-full w-full flex flex-col bg-gradient-to-b from-blue-900 to-indigo-950 text-white font-sans overflow-hidden">
-            <!-- Loading Indicator -->
             <div class="weather-loader absolute inset-0 bg-neutral-950/80 z-20 flex flex-col items-center justify-center gap-3 hidden">
                 <div class="w-8 h-8 border-3 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-xs text-sky-300 font-mono tracking-widest animate-pulse">PINGING METEOROLOGICAL STATION...</p>
             </div>
-            
-            <!-- Weather Input Prompters -->
-            <div class="weather-prompt-view flex-1 flex flex-col items-center justify-center p-6 space-y-4 select-none">
+            <div class="weather-prompt-view flex-1 flex flex-col items-center justify-center p-6 space-y-4 text-center">
                 <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-4xl animate-float">☁️</div>
-                <div class="text-center">
-                    <h3 class="font-bold text-lg">Live Satellite Weather</h3>
-                    <p class="text-xs text-gray-400 mt-1 max-w-xs leading-relaxed">Enter a city to retrieve up-to-the-minute atmospheric parameters using real Google Search metrics.</p>
-                </div>
+                <h3 class="font-bold text-lg">Live Satellite Weather</h3>
                 <form class="weather-location-form flex w-full max-w-xs gap-2">
-                    <input type="text" placeholder="e.g. New York, Tokyo..." class="weather-city-input flex-1 bg-white/5 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white outline-none focus:border-sky-400">
+                    <input type="text" placeholder="City name..." class="weather-city-input flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none">
                     <button type="submit" class="px-3 bg-sky-500 hover:bg-sky-400 text-black font-semibold text-xs rounded-xl">Check</button>
                 </form>
             </div>
-
-            <!-- Active Weather Stats View -->
             <div class="weather-stats-view flex-1 hidden flex-col justify-between p-5 relative overflow-y-auto">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="weather-city-name text-2xl font-bold">New York</h2>
-                        <p class="text-xs text-white/70">Current Satellite Metrics</p>
-                    </div>
-                    <button class="weather-change-city-btn text-xs px-2.5 py-1.5 bg-white/10 hover:bg-white/20 border border-white/5 rounded-lg">Change 📍</button>
+                    <div><h2 class="weather-city-name text-2xl font-bold">City</h2><p class="text-xs text-white/70">Current Metrics</p></div>
+                    <button class="weather-change-city-btn text-xs px-2 py-1.5 bg-white/10 rounded-lg">📍</button>
                 </div>
-
-                <!-- Large Temp Center -->
-                <div class="text-center py-4 flex flex-col items-center justify-center">
+                <div class="text-center py-4">
                     <div class="weather-icon-badge text-6xl mb-2 animate-float">☀️</div>
-                    <h1 class="weather-temp text-5xl font-light">22°C</h1>
-                    <p class="weather-condition text-sm font-medium mt-1 tracking-wide uppercase text-sky-200">Sunny</p>
-                    <p class="weather-range text-xs text-white/60 mt-1">H: 24°C  L: 18°C</p>
+                    <h1 class="weather-temp text-5xl font-light">0°C</h1>
+                    <p class="weather-condition text-sm font-medium mt-1 text-sky-200">Clear</p>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-xl p-3 grid grid-cols-3 gap-2 text-center text-xs">
+                    <div><p class="text-[10px] text-white/50 mb-0.5">Wind</p><p class="weather-wind font-bold">0 km/h</p></div>
+                    <div><p class="text-[10px] text-white/50 mb-0.5">Humidity</p><p class="weather-humidity font-bold">0%</p></div>
+                    <div><p class="text-[10px] text-white/50 mb-0.5">Precip</p><p class="weather-precip font-bold">0%</p></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="app-settings">
+        <div class="flex h-full bg-neutral-900/95 font-sans">
+            <div class="w-36 bg-neutral-950 border-r border-white/5 p-3 flex flex-col gap-2 text-[11px] shrink-0">
+                <button class="settings-nav-btn w-full text-left px-2 py-2 bg-white/5 border-l-2 border-purple-500 text-white rounded-r-md" data-tab="tab-theme">🎨 Personalization</button>
+                <button class="settings-nav-btn w-full text-left px-2 py-2 hover:bg-white/5 text-gray-400 rounded-md" data-tab="tab-network">📶 WiFi & Network</button>
+                <button class="settings-nav-btn w-full text-left px-2 py-2 hover:bg-white/5 text-gray-400 rounded-md" data-tab="tab-display">🖥️ Display & Accent</button>
+                <button class="settings-nav-btn w-full text-left px-2 py-2 hover:bg-white/5 text-gray-400 rounded-md" data-tab="tab-system">💾 VFS & Storage</button>
+            </div>
+            <div class="flex-1 p-5 overflow-y-auto space-y-6 text-sm">
+                <!-- Theme Tab -->
+                <div id="tab-theme" class="settings-tab-view space-y-4">
+                    <h3 class="font-bold text-white border-b border-white/10 pb-2">Desktop Wallpaper (7 Options)</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="settings-theme-btn border-2 border-purple-500 rounded-xl h-14 bg-gradient-to-tr from-indigo-950 via-purple-950 to-neutral-950 text-xs text-purple-300" data-gradient="radial-gradient(circle at center, #1b0e3d 0%, #080314 100%)">Deep Cosmos</button>
+                        <button class="settings-theme-btn border border-white/10 rounded-xl h-14 bg-gradient-to-tr from-emerald-950 to-neutral-950 text-xs text-emerald-300" data-gradient="radial-gradient(circle at top right, #064e3b 0%, #022c22 40%, #020617 100%)">Aurora Borealis</button>
+                        <button class="settings-theme-btn border border-white/10 rounded-xl h-14 bg-gradient-to-tr from-rose-950 via-neutral-900 to-black text-xs text-rose-300" data-gradient="linear-gradient(135deg, #f43f5e 0%, #581c87 50%, #0f172a 100%)">Supernova Flare</button>
+                        <button class="settings-theme-btn border border-white/10 rounded-xl h-14 bg-gradient-to-tr from-slate-900 to-neutral-950 text-xs text-cyan-300" data-gradient="linear-gradient(135deg, #050b14 0%, #1a0b2e 50%, #050014 100%)">Cyberpunk Sun</button>
+                        <button class="settings-theme-btn border border-white/10 rounded-xl h-14 bg-gradient-to-tr from-orange-950 via-stone-900 to-neutral-950 text-xs text-amber-300" data-gradient="radial-gradient(circle at bottom left, #ea580c 0%, #701a75 40%, #090514 100%)">Deep Solar Flare</button>
+                        <button class="settings-theme-btn border border-white/10 rounded-xl h-14 bg-gradient-to-tr from-indigo-950 via-violet-950 to-black text-xs text-indigo-300" data-gradient="linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #020617 100%)">Orion Cosmic</button>
+                        <button class="settings-theme-btn border border-white/10 rounded-xl h-14 bg-gradient-to-tr from-zinc-950 to-black text-xs text-gray-300" data-gradient="radial-gradient(circle at center, #0f172a 0%, #020617 100%)">Deep Void</button>
+                    </div>
                 </div>
 
-                <!-- Parameters card -->
-                <div class="bg-white/5 border border-white/10 rounded-xl p-3 grid grid-cols-3 gap-2 text-center text-xs">
-                    <div>
-                        <p class="text-[10px] text-white/50 mb-0.5">Wind</p>
-                        <p class="weather-wind font-bold">12 km/h</p>
+                <!-- Network Tab (WiFi Scanner Fixed!) -->
+                <div id="tab-network" class="settings-tab-view hidden space-y-4">
+                    <h3 class="font-bold text-white border-b border-white/10 pb-2">WiFi & Connections</h3>
+                    <div class="flex justify-between bg-white/5 p-3 rounded-xl border border-white/5 items-center">
+                        <div>
+                            <p id="settings-wifi-status" class="font-bold text-green-400">Connected</p>
+                            <p id="settings-wifi-ssid" class="text-xs text-gray-400">SSID: Nebula_Cosmos_Net</p>
+                        </div>
+                        <input type="checkbox" id="settings-wifi-toggle" class="w-9 h-5 bg-gray-600 rounded-full appearance-none checked:bg-purple-600 transition-colors relative cursor-pointer" checked>
                     </div>
-                    <div>
-                        <p class="text-[10px] text-white/50 mb-0.5">Humidity</p>
-                        <p class="weather-humidity font-bold">64%</p>
+                    <div class="pt-2">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Available Networks</p>
+                        <div id="settings-wifi-networks-list" class="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                            <!-- Populated with WiFi connection items dynamically -->
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-[10px] text-white/50 mb-0.5">Precipitation</p>
-                        <p class="weather-precip font-bold">10%</p>
+                </div>
+
+                <!-- Display & Accent Tab -->
+                <div id="tab-display" class="settings-tab-view hidden space-y-4">
+                    <h3 class="font-bold text-white border-b border-white/10 pb-2">Display & Desktop Accent</h3>
+                    
+                    <!-- Scanline Toggle -->
+                    <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
+                        <div>
+                            <p class="font-medium text-xs text-gray-200">CRT Scanline overlay 📺</p>
+                            <p class="text-[10px] text-gray-400">Retro CRT visual filter overlay effect</p>
+                        </div>
+                        <input type="checkbox" id="settings-scanline-toggle" class="w-9 h-5 bg-gray-600 rounded-full appearance-none checked:bg-purple-600 transition-colors relative cursor-pointer" checked>
+                    </div>
+
+                    <!-- Window Opacity Slider -->
+                    <div class="space-y-2 bg-white/5 p-3 rounded-xl border border-white/5">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-200">Glass Window Opacity 🪟</span>
+                            <span id="transparency-val-lbl" class="text-purple-400 font-bold">85%</span>
+                        </div>
+                        <input type="range" id="settings-transparency-slider" min="0.4" max="0.98" step="0.02" value="0.85" class="w-full accent-purple-500 cursor-pointer">
+                    </div>
+
+                    <!-- Accent Color Selection -->
+                    <div class="space-y-2 bg-white/5 p-3 rounded-xl border border-white/5">
+                        <p class="text-xs text-gray-200">Primary System Accent Color ⚡</p>
+                        <div class="flex gap-2.5 pt-1">
+                            <button class="settings-accent-btn w-6 h-6 rounded-full border-2 border-white ring-2 ring-purple-500 bg-purple-500" data-color="#a855f7" data-border="rgba(168, 85, 247, 0.75)" data-text="#c084fc"></button>
+                            <button class="settings-accent-btn w-6 h-6 rounded-full border-2 border-transparent bg-pink-500" data-color="#ec4899" data-border="rgba(236, 72, 153, 0.75)" data-text="#f472b6"></button>
+                            <button class="settings-accent-btn w-6 h-6 rounded-full border-2 border-transparent bg-emerald-500" data-color="#10b981" data-border="rgba(16, 185, 129, 0.75)" data-text="#34d399"></button>
+                            <button class="settings-accent-btn w-6 h-6 rounded-full border-2 border-transparent bg-cyan-500" data-color="#06b6d4" data-border="rgba(6, 182, 212, 0.75)" data-text="#22d3ee"></button>
+                            <button class="settings-accent-btn w-6 h-6 rounded-full border-2 border-transparent bg-amber-500" data-color="#f59e0b" data-border="rgba(245, 158, 11, 0.75)" data-text="#fbbf24"></button>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Shortcut Size selection -->
+                    <div class="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
+                        <div>
+                            <p class="font-medium text-xs text-gray-200">Desktop Shortcut Layout 📐</p>
+                            <p class="text-[10px] text-gray-400">Scale desktop shortcut icons</p>
+                        </div>
+                        <select id="settings-icon-size" class="bg-neutral-950 border border-white/10 rounded-lg px-2 py-1 text-xs text-gray-200 outline-none">
+                            <option value="small">Small Icons</option>
+                            <option value="medium" selected>Medium Icons</option>
+                            <option value="large">Large Icons</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- VFS & System Storage Tab -->
+                <div id="tab-system" class="settings-tab-view hidden space-y-4">
+                    <h3 class="font-bold text-white border-b border-white/10 pb-2">Virtual Storage Monitor (VFS)</h3>
+                    
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 space-y-3">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-300">Disk Capacity Allocation:</span>
+                            <span id="settings-vfs-count-lbl" class="text-purple-400 font-bold">2 files used</span>
+                        </div>
+                        <div class="w-full bg-neutral-950 h-2.5 rounded-full overflow-hidden border border-white/10">
+                            <div id="settings-vfs-progress" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-[5%] transition-all"></div>
+                        </div>
+                        <p class="text-[10px] text-gray-400">Nebula VFS filesystem has static limits of 50 total active records.</p>
+                    </div>
+
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center justify-between">
+                        <div>
+                            <p class="font-medium text-xs text-gray-200">System Audio FX Feedback 🔊</p>
+                            <p class="text-[10px] text-gray-400">Chirp and click sounds on desktop interactions</p>
+                        </div>
+                        <input type="checkbox" id="settings-audio-toggle" class="w-9 h-5 bg-gray-600 rounded-full appearance-none checked:bg-purple-600 transition-colors relative cursor-pointer" checked>
+                    </div>
+
+                    <div class="p-3 bg-red-950/20 border border-red-500/20 rounded-xl space-y-2">
+                        <p class="font-bold text-xs text-red-400">Danger Zone Core Action</p>
+                        <p class="text-[10px] text-gray-400 leading-relaxed">Formatting the Virtual Filesystem will purge all sketches, documents, and added directories back to original baseline specifications.</p>
+                        <button id="settings-reset-vfs" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-bold transition-colors">Format VFS Disk</button>
                     </div>
                 </div>
             </div>
         </div>
     </template>
 
-
-    <!-- ================= SYSTEM LOGIC CORE JS ================= -->
     <script>
-        const apiKey = ""; // Canvas framework injects custom auth token
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nebula-os';
-        let systemStartTime = Date.now();
-
-        // Virtual File System (VFS)
-        const VFS = {
+        // 🔑 The injected API Key
+        const apiKey = "AQ.Ab8RN6IQNP6PaD48_hUSQFlwENILawvIzHZtD2sPur4kSTxXkw"; 
+        
+        let VFS = { 
             '/': [
-                { name: 'ReadMe_First.txt', type: 'text', content: 'Welcome to NebulaOS Ultra (v4.0)! 🌌\n\nThis build introduces real-time web integration inside the browser and weather apps. Save paint files to Drawings, documents to Docs, scan available networks or add customized system accounts from the Settings Control Panel.\n\nEnjoy!' },
+                { name: 'Welcome_First.txt', type: 'text', content: 'Welcome to NebulaOS Ultra (v4.0)! 🌌\n\nThis build introduces real-time web integration inside the browser and weather apps. Save paint files to Drawings, documents to Docs, scan available networks or add customized system accounts from the Settings Control Panel.\n\nEnjoy!' },
                 { name: 'System_Info.txt', type: 'text', content: 'Kernel Node: N-4.0-ULTRA\nMemory Capacity: 8GB Simulated\nGrounding Core Engine: Active\nVFS State: OK' }
-            ],
-            '/docs': [],
-            '/drawings': []
+            ], 
+            '/docs': [], 
+            '/drawings': [] 
         };
-
-        // System state arrays
-        let accountsRegistry = ["Nebula Guest", "Developer Core", "Administrator"];
-        let currentActiveUser = "Nebula Guest";
-        let isWifiSimConnected = true;
-        let currentWifiSimSSID = "Nebula_Cosmos_Net";
-        let isSoundFXEnabled = true;
-
-        // Registered OS Apps Definitions
-        const APPS = {
-            'explorer': { name: 'Files 📂', icon: '📂', template: 'app-explorer', width: '550px', height: '360px', bgClass: 'from-amber-400 to-orange-500' },
-            'gemini-ai': { name: 'Gemini AI 🤖', icon: '🤖', template: 'app-gemini-ai', width: '520px', height: '480px', bgClass: 'from-blue-600 to-cyan-400' },
-            'imagen-studio': { name: 'Imagen Art 🎨', icon: '🌌', template: 'app-imagen-studio', width: '500px', height: '480px', bgClass: 'from-pink-500 to-rose-400' },
-            'browser': { name: 'Cosmic Web 🌐', icon: '🌐', template: 'app-browser', width: '700px', height: '500px', bgClass: 'from-indigo-600 to-violet-500' },
-            'weather': { name: 'Weather ☁️', icon: '☁️', template: 'app-weather', width: '340px', height: '460px', bgClass: 'from-sky-400 to-blue-500' },
-            'terminal': { name: 'Terminal 💻', icon: '💻', template: 'app-terminal', width: '600px', height: '380px', bgClass: 'from-neutral-700 to-slate-800' },
-            'paint': { name: 'Paint 🖌️', icon: '🖌️', template: 'app-paint', width: '560px', height: '420px', bgClass: 'from-rose-500 to-pink-500' },
-            'notepad': { name: 'Notepad 📝', icon: '📝', template: 'app-notepad', width: '480px', height: '350px', bgClass: 'from-yellow-400 to-amber-500' },
-            'calculator': { name: 'Calculator 🔢', icon: '🔢', template: 'app-calculator', width: '280px', height: '380px', bgClass: 'from-teal-400 to-emerald-500' },
-            'settings': { name: 'Settings ⚙️', icon: '⚙️', template: 'app-settings', width: '450px', height: '420px', bgClass: 'from-slate-500 to-slate-700' }
-        };
-
         let openWindowsList = [];
         let activeWindowId = null;
         let zIndexCounter = 100;
+        
+        // Login & User State
+        let accountsRegistry = {
+            "Administrator": "Iknow2013@",
+            "Nebula Guest": "" 
+        };
+        let currentActiveUser = null;
+        let isWifiSimConnected = true;
+        let currentWifiSimSSID = "Nebula_Cosmos_Net";
+        let isSoundFXEnabled = true;
+        let currentIconSize = "medium";
 
-        // Sound System
+        const APPS = {
+            'explorer': { name: 'Files 📂', icon: '📂', template: 'app-explorer', width: '550px', height: '360px' },
+            'gemini-ai': { name: 'Gemini AI 🤖', icon: '🤖', template: 'app-gemini-ai', width: '520px', height: '480px' },
+            'imagen-studio': { name: 'Imagen Art 🎨', icon: '🌌', template: 'app-imagen-studio', width: '500px', height: '480px' },
+            'browser': { name: 'Web Search 🌐', icon: '🌐', template: 'app-browser', width: '700px', height: '500px' },
+            'weather': { name: 'Weather ☁️', icon: '☁️', template: 'app-weather', width: '340px', height: '460px' },
+            'terminal': { name: 'Terminal 💻', icon: '💻', template: 'app-terminal', width: '600px', height: '380px' },
+            'paint': { name: 'Paint 🖌️', icon: '🖌️', template: 'app-paint', width: '560px', height: '420px' },
+            'notepad': { name: 'Notepad 📝', icon: '📝', template: 'app-notepad', width: '480px', height: '350px' },
+            'settings': { name: 'Settings ⚙️', icon: '⚙️', template: 'app-settings', width: '500px', height: '445px' }
+        };
+
+        // --- Sound Engine ---
         function playSysSound(type = 'click') {
             if (!isSoundFXEnabled) return;
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+                osc.connect(gain); gain.connect(ctx.destination);
                 
                 if (type === 'click') {
                     osc.frequency.setValueAtTime(1000, ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(250, ctx.currentTime + 0.08);
                     gain.gain.setValueAtTime(0.06, ctx.currentTime);
                     gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.08);
+                    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.08);
                 } else if (type === 'success') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
-                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
                     gain.gain.setValueAtTime(0.04, ctx.currentTime);
                     gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.35);
+                    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.35);
                 } else if (type === 'error') {
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(140, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(70, ctx.currentTime + 0.25);
                     gain.gain.setValueAtTime(0.1, ctx.currentTime);
                     gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.25);
-                } else if (type === 'boot') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(329.63, ctx.currentTime); // E4
-                    osc.frequency.setValueAtTime(392.00, ctx.currentTime + 0.15); // G4
-                    osc.frequency.setValueAtTime(523.25, ctx.currentTime + 0.3); // C5
-                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.45); // E5
-                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.9);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.9);
+                    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.25);
                 }
-            } catch (e) {
-                console.log("Audio platform blocked: " + e);
-            }
+            } catch (e) {}
         }
 
-
-        // custom Modal Dialogue Manager
+        // --- Notifications & Modals ---
         let sysDialogResolve = null;
-        const modalEl = document.getElementById('system-modal');
-        const modalBox = document.getElementById('modal-box');
-        const modalTitle = document.getElementById('modal-title');
-        const modalMessage = document.getElementById('modal-message');
-        const modalInput = document.getElementById('modal-input');
-        const btnCancel = document.getElementById('modal-btn-cancel');
-        const btnConfirm = document.getElementById('modal-btn-confirm');
-
         function sysDialog(title, message, isPrompt = false, placeholder = "") {
             return new Promise((resolve) => {
                 sysDialogResolve = resolve;
-                modalTitle.textContent = title;
-                modalMessage.textContent = message;
-                
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-message').textContent = message;
+                const mInp = document.getElementById('modal-input');
+                const cBtn = document.getElementById('modal-btn-cancel');
                 if (isPrompt) {
-                    modalInput.classList.remove('hidden');
-                    modalInput.placeholder = placeholder;
-                    modalInput.value = "";
-                    btnCancel.classList.remove('hidden');
-                    setTimeout(() => modalInput.focus(), 100);
+                    mInp.classList.remove('hidden'); mInp.placeholder = placeholder; mInp.value = "";
+                    cBtn.classList.remove('hidden'); setTimeout(() => mInp.focus(), 100);
                 } else {
-                    modalInput.classList.add('hidden');
-                    btnCancel.classList.add('hidden');
+                    mInp.classList.add('hidden'); cBtn.classList.add('hidden');
                 }
-
-                modalEl.classList.remove('hidden');
-                setTimeout(() => modalBox.classList.remove('scale-95'), 10);
+                document.getElementById('system-modal').classList.remove('hidden');
+                setTimeout(() => document.getElementById('modal-box').classList.remove('scale-95'), 10);
             });
         }
 
-        btnCancel.addEventListener('click', () => {
-            modalEl.classList.add('hidden');
-            modalBox.classList.add('scale-95');
-            if (sysDialogResolve) sysDialogResolve(null);
-        });
-
-        btnConfirm.addEventListener('click', () => {
-            const result = modalInput.classList.contains('hidden') ? true : modalInput.value;
-            modalEl.classList.add('hidden');
-            modalBox.classList.add('scale-95');
-            if (sysDialogResolve) sysDialogResolve(result);
-        });
-
-        // Notifications Manager
         function showNotification(title, text, type = 'info') {
             const area = document.getElementById('notification-area');
             const toast = document.createElement('div');
-            toast.className = `p-3 rounded-xl border backdrop-blur-md shadow-lg flex items-start gap-3 transition-all duration-300 transform translate-x-12 opacity-0 select-none max-w-sm w-full`;
+            toast.className = `p-3 rounded-xl border backdrop-blur-md shadow-lg flex items-start gap-3 transition-all duration-300 transform translate-x-12 opacity-0 select-none max-w-sm w-full z-[9999]`;
+            toast.classList.add(type === 'success' ? 'bg-green-950/90' : type === 'error' ? 'bg-red-950/90' : 'bg-neutral-900/90');
+            toast.classList.add(type === 'success' ? 'border-green-500/30' : type === 'error' ? 'border-red-500/30' : 'border-white/10');
+            toast.classList.add(type === 'success' ? 'text-green-200' : type === 'error' ? 'text-red-200' : 'text-gray-200');
+            let icon = type === 'success' ? '⭐' : type === 'error' ? '⚠️' : '🔔';
             
-            let icon = '🔔';
-            if (type === 'success') {
-                toast.classList.add('bg-green-950/90', 'border-green-500/30', 'text-green-200');
-                icon = '⭐';
-                playSysSound('success');
-            } else if (type === 'error') {
-                toast.classList.add('bg-red-950/90', 'border-red-500/30', 'text-red-200');
-                icon = '⚠️';
-                playSysSound('error');
-            } else {
-                toast.classList.add('bg-neutral-900/90', 'border-white/10', 'text-gray-200');
-                icon = '📡';
-                playSysSound('click');
-            }
-
-            toast.innerHTML = `
-                <div class="text-xl">${icon}</div>
-                <div class="flex-1">
-                    <h5 class="font-bold text-xs">${title}</h5>
-                    <p class="text-[11px] text-gray-300 mt-0.5">${text}</p>
-                </div>
-                <button class="text-gray-400 hover:text-white font-bold text-xs">×</button>
-            `;
+            toast.innerHTML = `<div class="text-xl">${icon}</div><div class="flex-1"><h5 class="font-bold text-xs">${title}</h5><p class="text-[11px] text-gray-300 mt-0.5">${text}</p></div><button class="text-gray-400 hover:text-white font-bold text-xs">×</button>`;
             area.appendChild(toast);
-            
             setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 10);
-            
-            toast.querySelector('button').addEventListener('click', () => toast.remove());
-
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.classList.add('opacity-0', 'scale-95');
-                    setTimeout(() => toast.remove(), 300);
-                }
-            }, 5000);
+            toast.querySelector('button').onclick = () => toast.remove();
+            setTimeout(() => { if (toast.parentElement) { toast.classList.add('opacity-0', 'scale-95'); setTimeout(() => toast.remove(), 300); } }, 5000);
+            if(type==='success') playSysSound('success'); else if(type==='error') playSysSound('error'); else playSysSound('click');
         }
 
-        // ================= BOOTING PROTOCOLS =================
-        window.addEventListener('DOMContentLoaded', () => {
-            const bLog2 = document.getElementById('boot-log-2');
-            const bLog3 = document.getElementById('boot-log-3');
-            const bLog4 = document.getElementById('boot-log-4');
-            const bLog5 = document.getElementById('boot-log-5');
-            const bProgBar = document.getElementById('boot-progress-bar');
-            const bProg = document.getElementById('boot-progress');
-            const bBtn = document.getElementById('boot-btn');
+        document.addEventListener('DOMContentLoaded', () => {
+            // Setup Modal listeners
+            document.getElementById('modal-btn-cancel').onclick = () => {
+                document.getElementById('system-modal').classList.add('hidden');
+                document.getElementById('modal-box').classList.add('scale-95');
+                if (sysDialogResolve) sysDialogResolve(null);
+            };
+            document.getElementById('modal-btn-confirm').onclick = () => {
+                const res = document.getElementById('modal-input').classList.contains('hidden') ? true : document.getElementById('modal-input').value;
+                document.getElementById('system-modal').classList.add('hidden');
+                document.getElementById('modal-box').classList.add('scale-95');
+                if (sysDialogResolve) sysDialogResolve(res);
+            };
 
-            setTimeout(() => { bLog2.classList.remove('hidden'); playSysSound('click'); }, 500);
-            setTimeout(() => { bLog3.classList.remove('hidden'); playSysSound('click'); }, 1000);
-            setTimeout(() => { bLog4.classList.remove('hidden'); playSysSound('click'); }, 1500);
+            // Boot Sequence
+            setTimeout(() => { document.getElementById('boot-log-2').classList.remove('hidden'); playSysSound('click'); }, 500);
+            setTimeout(() => { document.getElementById('boot-log-3').classList.remove('hidden'); playSysSound('click'); }, 1000);
             setTimeout(() => { 
-                bLog5.classList.remove('hidden'); 
-                bProgBar.classList.remove('hidden');
-                playSysSound('click');
-                let percent = 0;
-                const tracker = setInterval(() => {
-                    percent += 8;
-                    bProg.style.width = `${percent}%`;
-                    if (percent >= 100) {
-                        clearInterval(tracker);
-                        bBtn.classList.remove('hidden');
-                        playSysSound('success');
-                    }
+                document.getElementById('boot-progress-bar').classList.remove('hidden'); playSysSound('click');
+                let pct = 0;
+                const intv = setInterval(() => {
+                    pct += 10; document.getElementById('boot-progress').style.width = `${pct}%`;
+                    if (pct >= 100) { clearInterval(intv); transitionToLogin(); }
                 }, 80);
-            }, 2000);
-
-            bBtn.addEventListener('click', () => {
-                document.getElementById('boot-screen').remove();
-                document.getElementById('desktop-env').classList.remove('hidden');
-                playSysSound('boot');
-                initializeDesktop();
-            });
+            }, 1500);
         });
 
-        // ================= DESKTOP ENGINE BOOT =================
-        function initializeDesktop() {
-            renderDesktopIcons();
-            renderStartMenu();
-            initClock();
-            initSystemTrayClicks();
-            initStartMenuActions();
-            showNotification("System Booted 🌌", "Welcome back, guest explorer. Grounding engines ready.", "success");
+        // --- AUTH & LOGIN SYSTEM ---
+        function transitionToLogin() {
+            document.getElementById('boot-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('boot-screen').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('login-screen').classList.add('flex');
+            }, 500);
         }
 
-        // Clock logic
+        const loginUserSelect = document.getElementById('login-user-select');
+        const loginPasswordInput = document.getElementById('login-password');
+        
+        loginUserSelect.addEventListener('change', () => {
+            const user = loginUserSelect.value;
+            // Only Administrator strictly needs a password in this UI out-of-the-box
+            if (user === "Administrator") {
+                loginPasswordInput.placeholder = "Enter Admin password";
+                loginPasswordInput.classList.remove('opacity-50');
+                loginPasswordInput.disabled = false;
+            } else if (accountsRegistry[user] === "") {
+                loginPasswordInput.placeholder = "No password required";
+                loginPasswordInput.value = "";
+                loginPasswordInput.classList.add('opacity-50');
+                loginPasswordInput.disabled = true;
+            } else {
+                loginPasswordInput.placeholder = "Enter your password";
+                loginPasswordInput.classList.remove('opacity-50');
+                loginPasswordInput.disabled = false;
+            }
+        });
+
+        document.getElementById('btn-login-submit').addEventListener('click', () => {
+            const user = loginUserSelect.value;
+            const pass = loginPasswordInput.value;
+
+            if (accountsRegistry[user] !== undefined) {
+                if (accountsRegistry[user] === pass || accountsRegistry[user] === "") {
+                    // Success Login
+                    currentActiveUser = user;
+                    playSysSound('success');
+                    bootDesktopEnvironment();
+                } else {
+                    // Fail
+                    playSysSound('error');
+                    showNotification("Access Denied", "Incorrect password for " + user, "error");
+                    loginPasswordInput.value = '';
+                }
+            }
+        });
+
+        // Toggle Signup/Login views
+        document.getElementById('btn-show-signup').onclick = () => {
+            document.getElementById('form-login').classList.add('hidden');
+            document.getElementById('form-signup').classList.remove('hidden');
+            document.getElementById('login-title').textContent = "Create Account";
+            document.getElementById('login-subtitle').textContent = "Join the Nebula System";
+            playSysSound('click');
+        };
+
+        document.getElementById('btn-show-login').onclick = () => {
+            document.getElementById('form-signup').classList.add('hidden');
+            document.getElementById('form-login').classList.remove('hidden');
+            document.getElementById('login-title').textContent = "Welcome Back";
+            document.getElementById('login-subtitle').textContent = "Authenticate to access NebulaOS";
+            playSysSound('click');
+        };
+
+        // Handle Signup
+        document.getElementById('btn-signup-submit').onclick = () => {
+            const newUser = document.getElementById('signup-username').value.trim();
+            const newPass = document.getElementById('signup-password').value;
+
+            if (!newUser) {
+                showNotification("Invalid Entry", "Username cannot be blank.", "error");
+                return;
+            }
+            if (accountsRegistry[newUser] !== undefined) {
+                showNotification("Account Exists", "This username is already taken.", "error");
+                return;
+            }
+
+            // Register and immediately log in
+            accountsRegistry[newUser] = newPass;
+            currentActiveUser = newUser;
+            
+            // Add to dropdown for future sessions
+            const opt = document.createElement('option');
+            opt.value = newUser;
+            opt.textContent = newUser;
+            loginUserSelect.appendChild(opt);
+
+            playSysSound('success');
+            bootDesktopEnvironment();
+        };
+
+
+        // --- DESKTOP ENVIRONMENT BOOT ---
+        function bootDesktopEnvironment() {
+            document.getElementById('login-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('desktop-env').classList.remove('hidden');
+                
+                // Set Profile Data
+                document.getElementById('start-profile-name').innerHTML = `${currentActiveUser} <i class="fa-solid fa-rocket text-purple-400"></i>`;
+                
+                renderDesktopIcons();
+                renderStartMenu();
+                initClock();
+                initStartMenuActions();
+                initContextMenu();
+                
+                showNotification("Authentication Complete", `Welcome to NebulaOS, ${currentActiveUser}!`, "success");
+            }, 700);
+        }
+
+        // --- OS CORE SYSTEMS ---
         function initClock() {
             const syncTime = () => {
                 const now = new Date();
                 let hours = now.getHours();
-                const minutes = String(now.getMinutes()).padStart(2, '0');
                 const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12 || 12;
-                document.getElementById('system-time').textContent = `${hours}:${minutes} ${ampm}`;
+                document.getElementById('system-time').textContent = `${hours % 12 || 12}:${String(now.getMinutes()).padStart(2, '0')} ${ampm}`;
                 document.getElementById('system-date').textContent = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
             };
-            syncTime();
-            setInterval(syncTime, 10000);
-        }
-
-        function initSystemTrayClicks() {
-            document.getElementById('clock-container').addEventListener('click', () => {
-                const now = new Date();
-                showNotification("Calender & Time 📅", `${now.toDateString()} @ ${now.toLocaleTimeString()}`, "info");
-            });
-            document.getElementById('sys-wifi-icon').addEventListener('click', () => {
-                showNotification("Network Health 📶", isWifiSimConnected ? `Connected to ${currentWifiSimSSID}` : "Simulated wifi is disconnected", "info");
-            });
-            document.getElementById('sys-battery-icon').addEventListener('click', () => {
-                showNotification("Battery telemetry 🔋", "Internal Power: 92% Status: Discharging", "info");
-            });
+            syncTime(); setInterval(syncTime, 10000);
         }
 
         function renderDesktopIcons() {
             const grid = document.getElementById('desktop-grid');
             grid.innerHTML = '';
+            
+            // Adjust scaling sizes
+            let colClasses = "grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4";
+            let scaleClass = "w-20 h-20 md:w-22 md:h-22";
+            let iconScale = "text-3xl md:text-4xl";
+            let fontScale = "text-[10px] md:text-xs";
+            
+            if (currentIconSize === "small") {
+                colClasses = "grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2";
+                scaleClass = "w-16 h-16";
+                iconScale = "text-2xl";
+                fontScale = "text-[9px]";
+            } else if (currentIconSize === "large") {
+                colClasses = "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6";
+                scaleClass = "w-24 h-24";
+                iconScale = "text-4xl md:text-5xl";
+                fontScale = "text-xs md:text-sm";
+            }
+            
+            grid.className = `flex-1 p-4 md:p-6 grid grid-flow-row ${colClasses} items-start content-start relative overflow-hidden`;
+
             Object.keys(APPS).forEach(key => {
                 const app = APPS[key];
                 const icon = document.createElement('div');
-                icon.className = "flex flex-col items-center justify-center p-2 rounded-xl border border-transparent hover:bg-white/10 cursor-pointer text-center select-none transition-all duration-150 group w-20 h-20 md:w-22 md:h-22";
-                icon.innerHTML = `
-                    <div class="text-3xl md:text-4xl mb-1 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)] transition-transform group-hover:scale-110">${app.icon}</div>
-                    <div class="text-[10px] md:text-xs font-semibold text-gray-200 truncate w-full filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">${app.name.split(' ')[0]}</div>
-                `;
-                icon.addEventListener('click', () => launchApp(key));
+                icon.className = `flex flex-col items-center justify-center p-2 rounded-xl border border-transparent hover:bg-white/10 cursor-pointer text-center select-none transition-all duration-150 group ${scaleClass}`;
+                icon.innerHTML = `<div class="${iconScale} mb-1 filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)] group-hover:scale-110 transition-transform">${app.icon}</div><div class="${fontScale} font-semibold text-gray-200 truncate w-full filter drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">${app.name.split(' ')[0]}</div>`;
+                icon.onclick = () => launchApp(key);
                 grid.appendChild(icon);
             });
         }
@@ -894,108 +824,92 @@
             list.innerHTML = '';
             Object.keys(APPS).forEach(key => {
                 const app = APPS[key];
-                const button = document.createElement('button');
-                button.className = "w-full flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-purple-600/30 rounded-xl transition-all";
-                button.innerHTML = `<span class="text-base">${app.icon}</span><span class="font-medium">${app.name}</span>`;
-                button.addEventListener('click', () => {
-                    launchApp(key);
-                    toggleStartMenu(false);
-                });
-                list.appendChild(button);
+                const btn = document.createElement('button');
+                btn.className = "w-full flex items-center gap-3 px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-purple-600/30 rounded-xl transition-all";
+                btn.innerHTML = `<span class="text-base">${app.icon}</span><span class="font-medium">${app.name}</span>`;
+                btn.onclick = () => { launchApp(key); document.getElementById('start-menu').classList.add('hidden'); };
+                list.appendChild(btn);
             });
-        }
-
-        function toggleStartMenu(force) {
-            const menu = document.getElementById('start-menu');
-            if (force !== undefined) {
-                if (force) menu.classList.remove('hidden');
-                else menu.classList.add('hidden');
-            } else {
-                menu.classList.toggle('hidden');
-            }
         }
 
         function initStartMenuActions() {
-            document.getElementById('start-menu-trigger').addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleStartMenu();
+            const startMenu = document.getElementById('start-menu');
+            document.getElementById('start-menu-trigger').onclick = (e) => { e.stopPropagation(); startMenu.classList.toggle('hidden'); playSysSound('click'); };
+            document.addEventListener('click', () => startMenu.classList.add('hidden'));
+            startMenu.onclick = (e) => e.stopPropagation();
+            
+            // Log out button returns to login screen
+            document.getElementById('lock-screen-btn').onclick = () => {
+                startMenu.classList.add('hidden');
+                document.getElementById('desktop-env').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden', 'opacity-0');
+                document.getElementById('login-password').value = '';
+                showNotification("Logged Out", "Session terminated.", "info");
                 playSysSound('click');
-            });
-            document.addEventListener('click', () => toggleStartMenu(false));
-            document.getElementById('start-menu').addEventListener('click', (e) => e.stopPropagation());
+            };
+            
+            document.getElementById('reboot-os-btn').onclick = () => location.reload();
 
-            document.getElementById('lock-screen-btn').addEventListener('click', () => {
-                showNotification("Screen Lock 🔐", "Simulating system lock...", "info");
-                setTimeout(() => location.reload(), 1000);
-            });
-
-            document.getElementById('reboot-os-btn').addEventListener('click', () => {
-                showNotification("Rebooting OS 🔄", "Restarting kernel interfaces...", "error");
-                setTimeout(() => location.reload(), 1000);
-            });
-
-            document.getElementById('user-profile-header').addEventListener('click', () => {
-                showNotification("Active Profile 👽", `Logged in as ${currentActiveUser}`, "info");
-            });
-
-            // Quick search matching
-            document.getElementById('quick-search').addEventListener('input', (e) => {
+            document.getElementById('quick-search').oninput = (e) => {
                 const q = e.target.value.toLowerCase().trim();
-                const gridItems = document.getElementById('desktop-grid').children;
-                Object.keys(APPS).forEach((key, index) => {
-                    if (APPS[key].name.toLowerCase().includes(q)) {
-                        gridItems[index].style.display = 'flex';
-                    } else {
-                        gridItems[index].style.display = 'none';
-                    }
-                });
-            });
+                const items = document.getElementById('desktop-grid').children;
+                Object.keys(APPS).forEach((key, i) => { items[i].style.display = APPS[key].name.toLowerCase().includes(q) ? 'flex' : 'none'; });
+            };
         }
 
+        // --- CONTEXT MENU (RIGHT CLICK) ---
+        function initContextMenu() {
+            const ctxMenu = document.getElementById('desktop-context-menu');
+            document.getElementById('desktop-env').addEventListener('contextmenu', (e) => {
+                if (e.target.closest('.glass-window') || e.target.closest('.h-14') || e.target.closest('#start-menu')) return;
+                e.preventDefault();
+                ctxMenu.classList.remove('hidden');
+                let x = e.clientX, y = e.clientY;
+                if (x + 192 > window.innerWidth) x = window.innerWidth - 192;
+                if (y + 100 > window.innerHeight) y = window.innerHeight - 100;
+                ctxMenu.style.left = `${x}px`; ctxMenu.style.top = `${y}px`;
+            });
+            document.addEventListener('click', () => ctxMenu.classList.add('hidden'));
+            
+            document.getElementById('ctx-add-folder').onclick = async () => {
+                const name = await sysDialog("Create Folder 📁", "Enter new folder name:", true, "New_Folder");
+                if (name) {
+                    const safe = name.replace(/[^a-zA-Z0-9_-]/g, '');
+                    if (safe && !VFS["/" + safe.toLowerCase()]) {
+                        VFS["/" + safe.toLowerCase()] = [];
+                        showNotification("Folder Created", `/${safe.toLowerCase()} added to VFS`, "success");
+                        const explorer = openWindowsList.find(w => w.appId === 'explorer');
+                        if (explorer) bootstrapExplorer(explorer.element);
+                    }
+                }
+            };
+            document.getElementById('ctx-open-terminal').onclick = () => launchApp('terminal');
+        }
 
-        // ================= FLOATING WINDOWS ENGINE =================
+        // --- WINDOW MANAGER ---
         function launchApp(appId) {
             playSysSound('click');
             const openWin = openWindowsList.find(w => w.appId === appId);
-            if (openWin) {
-                focusWindow(openWin.id);
-                return;
-            }
+            if (openWin) return focusWindow(openWin.id);
 
             const app = APPS[appId];
             if (!app) return;
 
             const winId = `win-${Date.now()}`;
-            const template = document.getElementById('window-template');
-            const clone = template.cloneNode(true);
-
-            clone.id = winId;
-            clone.classList.remove('hidden');
-            clone.style.width = app.width;
-            clone.style.height = app.height;
-
+            const tpl = document.getElementById('window-template').cloneNode(true);
+            tpl.id = winId; tpl.classList.remove('hidden');
+            tpl.style.width = app.width; tpl.style.height = app.height;
             const offset = (openWindowsList.length * 20) % 150;
-            clone.style.top = `${80 + offset}px`;
-            clone.style.left = `${80 + offset}px`;
-
-            clone.querySelector('.window-icon').textContent = app.icon;
-            clone.querySelector('.window-title').textContent = app.name;
-
-            const contentTpl = document.getElementById(app.template);
-            if (contentTpl) {
-                clone.querySelector('.window-content').innerHTML = contentTpl.innerHTML;
-            }
-
-            document.getElementById('desktop-env').appendChild(clone);
-
-            const winState = {
-                id: winId,
-                appId: appId,
-                element: clone,
-                isMaximized: false,
-                prevStyle: null
-            };
-
+            tpl.style.top = `${80 + offset}px`; tpl.style.left = `${80 + offset}px`;
+            
+            tpl.querySelector('.window-icon').textContent = app.icon;
+            tpl.querySelector('.window-title').textContent = app.name;
+            const contentTpl = document.getElementById(`app-${appId}`);
+            if (contentTpl) tpl.querySelector('.window-content').innerHTML = contentTpl.innerHTML;
+            
+            document.getElementById('desktop-env').appendChild(tpl);
+            
+            const winState = { id: winId, appId: appId, element: tpl, isMax: false, prevStyle: null };
             openWindowsList.push(winState);
             setupWindowEvents(winState);
             bootstrapAppCode(winState);
@@ -1003,1054 +917,460 @@
             focusWindow(winId);
         }
 
-        function focusWindow(winId) {
+        function focusWindow(id) {
             openWindowsList.forEach(w => w.element.classList.remove('border-purple-500/75', 'shadow-purple-500/10'));
-            const win = openWindowsList.find(w => w.id === winId);
+            const win = openWindowsList.find(w => w.id === id);
             if (win) {
-                zIndexCounter++;
-                win.element.style.zIndex = zIndexCounter;
-                win.element.classList.add('border-purple-500/75', 'shadow-purple-500/10');
-                activeWindowId = winId;
-                
-                if (win.element.classList.contains('hidden')) {
-                    win.element.classList.remove('hidden', 'scale-95', 'opacity-0');
-                }
-
-                document.querySelectorAll('.taskbar-app-badge').forEach(badge => {
-                    if (badge.dataset.winId === winId) {
-                        badge.classList.add('bg-purple-600/50', 'border-purple-500');
-                    } else {
-                        badge.classList.remove('bg-purple-600/50', 'border-purple-500');
-                    }
+                win.element.style.zIndex = ++zIndexCounter;
+                win.element.classList.add('accent-border', 'accent-shadow');
+                if (win.element.classList.contains('hidden')) win.element.classList.remove('hidden', 'scale-95', 'opacity-0');
+                activeWindowId = id;
+                document.querySelectorAll('.taskbar-app-badge').forEach(b => {
+                    b.classList.toggle('bg-purple-600/50', b.dataset.winId === id);
+                    b.classList.toggle('accent-border', b.dataset.winId === id);
                 });
             }
         }
 
-        function minimizeWindow(winId) {
-            const win = openWindowsList.find(w => w.id === winId);
-            if (win) {
-                win.element.classList.add('hidden', 'scale-95', 'opacity-0');
-                playSysSound('click');
-            }
-        }
-
-        function closeWindow(winId) {
-            const index = openWindowsList.findIndex(w => w.id === winId);
-            if (index !== -1) {
-                openWindowsList[index].element.remove();
-                openWindowsList.splice(index, 1);
-                
-                const badge = document.querySelector(`.taskbar-app-badge[data-win-id="${winId}"]`);
+        function closeWindow(id) {
+            const idx = openWindowsList.findIndex(w => w.id === id);
+            if (idx > -1) {
+                openWindowsList[idx].element.remove(); openWindowsList.splice(idx, 1);
+                const badge = document.querySelector(`.taskbar-app-badge[data-win-id="${id}"]`);
                 if (badge) badge.remove();
-
-                if (activeWindowId === winId && openWindowsList.length > 0) {
-                    focusWindow(openWindowsList[openWindowsList.length - 1].id);
-                }
+                if (activeWindowId === id && openWindowsList.length > 0) focusWindow(openWindowsList[openWindowsList.length - 1].id);
                 playSysSound('click');
             }
         }
 
-        function toggleMaximize(winState) {
-            const win = winState.element;
-            if (winState.isMaximized) {
-                win.style.top = winState.prevStyle.top;
-                win.style.left = winState.prevStyle.left;
-                win.style.width = winState.prevStyle.width;
-                win.style.height = winState.prevStyle.height;
-                winState.isMaximized = false;
-            } else {
-                winState.prevStyle = {
-                    top: win.style.top,
-                    left: win.style.left,
-                    width: win.style.width,
-                    height: win.style.height
-                };
-                win.style.top = '0px';
-                win.style.left = '0px';
-                win.style.width = '100vw';
-                win.style.height = 'calc(100vh - 3.5rem)';
-                winState.isMaximized = true;
-            }
-            playSysSound('click');
-        }
-
-        function setupWindowEvents(winState) {
-            const win = winState.element;
-            const header = win.querySelector('.window-header');
-
-            let isDragging = false;
-            let sx, sy, iL, iT;
-
-            const dragStart = (e) => {
-                if (winState.isMaximized) return;
-                focusWindow(winState.id);
-                isDragging = true;
-                const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-                const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-                sx = clientX;
-                sy = clientY;
-                iL = parseInt(win.style.left) || 0;
-                iT = parseInt(win.style.top) || 0;
-
-                document.addEventListener('mousemove', dragMove);
-                document.addEventListener('mouseup', dragEnd);
-                document.addEventListener('touchmove', dragMove, { passive: false });
-                document.addEventListener('touchend', dragEnd);
-            };
-
+        function setupWindowEvents(state) {
+            const el = state.element, header = el.querySelector('.window-header');
+            let isDrag = false, sx, sy, il, it;
+            
             const dragMove = (e) => {
-                if (!isDragging) return;
-                if (e.cancelable) e.preventDefault();
-                const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-                const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-                const dx = clientX - sx;
-                const dy = clientY - sy;
-                win.style.left = `${iL + dx}px`;
-                win.style.top = `${iT + dy}px`;
+                if (!isDrag) return; e.preventDefault();
+                const x = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+                const y = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+                el.style.left = `${il + (x - sx)}px`; el.style.top = `${it + (y - sy)}px`;
             };
-
-            const dragEnd = () => {
-                isDragging = false;
-                document.removeEventListener('mousemove', dragMove);
-                document.removeEventListener('mouseup', dragEnd);
-                document.removeEventListener('touchmove', dragMove);
-                document.removeEventListener('touchend', dragEnd);
-            };
-
-            header.addEventListener('mousedown', dragStart);
-            header.addEventListener('touchstart', dragStart, { passive: true });
-
-            win.querySelector('.win-btn-close').addEventListener('click', () => closeWindow(winState.id));
-            win.querySelector('.win-btn-min').addEventListener('click', () => minimizeWindow(winState.id));
-            win.querySelector('.win-btn-max').addEventListener('click', () => toggleMaximize(winState));
-            win.addEventListener('mousedown', () => focusWindow(winState.id));
-
-            // Resize handle
-            const resizer = win.querySelector('.window-resize-handle');
-            let isResizing = false;
-            let initW, initH;
-
-            resizer.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                isResizing = true;
-                sx = e.clientX;
-                sy = e.clientY;
-                initW = parseInt(win.style.width);
-                initH = parseInt(win.style.height);
-
-                const resizeMove = (ev) => {
-                    if (!isResizing) return;
-                    const w = initW + (ev.clientX - sx);
-                    const h = initH + (ev.clientY - sy);
-                    if (w > 260) win.style.width = `${w}px`;
-                    if (h > 180) win.style.height = `${h}px`;
-                };
-
-                const resizeEnd = () => {
-                    isResizing = false;
-                    document.removeEventListener('mousemove', resizeMove);
-                    document.removeEventListener('mouseup', resizeEnd);
-                };
-
-                document.addEventListener('mousemove', resizeMove);
-                document.addEventListener('mouseup', resizeEnd);
+            const dragEnd = () => { isDrag = false; document.removeEventListener('mousemove', dragMove); document.removeEventListener('mouseup', dragEnd); };
+            
+            header.addEventListener('mousedown', (e) => {
+                if(state.isMax) return; focusWindow(state.id); isDrag = true;
+                sx = e.clientX; sy = e.clientY; il = parseInt(el.style.left) || 0; it = parseInt(el.style.top) || 0;
+                document.addEventListener('mousemove', dragMove); document.addEventListener('mouseup', dragEnd);
             });
-        }
 
-        function addToTaskbar(winState) {
-            const bar = document.getElementById('taskbar-apps');
-            const badge = document.createElement('button');
-            const app = APPS[winState.appId];
-
-            badge.className = "taskbar-app-badge flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/15 text-white transition-all shrink-0 active:scale-95";
-            badge.dataset.winId = winState.id;
-            badge.innerHTML = `<span>${app.icon}</span><span class="max-w-[70px] truncate hidden sm:inline">${app.name.split(' ')[0]}</span>`;
-
-            badge.addEventListener('click', () => {
-                const el = winState.element;
-                if (el.classList.contains('hidden')) {
-                    el.classList.remove('hidden', 'scale-95', 'opacity-0');
-                    focusWindow(winState.id);
-                } else if (activeWindowId === winState.id) {
-                    minimizeWindow(winState.id);
+            el.querySelector('.win-btn-close').onclick = () => closeWindow(state.id);
+            el.querySelector('.win-btn-min').onclick = () => { el.classList.add('hidden'); playSysSound('click'); };
+            el.querySelector('.win-btn-max').onclick = () => {
+                if (state.isMax) {
+                    el.style.top = state.prevStyle.top; el.style.left = state.prevStyle.left;
+                    el.style.width = state.prevStyle.width; el.style.height = state.prevStyle.height;
+                    state.isMax = false;
                 } else {
-                    focusWindow(winState.id);
+                    state.prevStyle = { top: el.style.top, left: el.style.left, width: el.style.width, height: el.style.height };
+                    el.style.top = '0px'; el.style.left = '0px'; el.style.width = '100vw'; el.style.height = 'calc(100vh - 3.5rem)';
+                    state.isMax = true;
                 }
-            });
-
-            bar.appendChild(badge);
+                playSysSound('click');
+            };
+            el.onmousedown = () => focusWindow(state.id);
         }
 
+        function addToTaskbar(state) {
+            const bar = document.getElementById('taskbar-apps');
+            const b = document.createElement('button');
+            const app = APPS[state.appId];
+            b.className = "taskbar-app-badge flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/15 text-white shrink-0";
+            b.dataset.winId = state.id;
+            b.innerHTML = `<span>${app.icon}</span><span class="truncate hidden sm:inline">${app.name.split(' ')[0]}</span>`;
+            b.onclick = () => {
+                if (state.element.classList.contains('hidden')) focusWindow(state.id);
+                else if (activeWindowId === state.id) { state.element.classList.add('hidden'); playSysSound('click'); }
+                else focusWindow(state.id);
+            };
+            bar.appendChild(b);
+        }
 
-        // ================= MULTI-APP BOOTSTRAPPER CODE =================
         function bootstrapAppCode(winState) {
             const root = winState.element;
             const id = winState.appId;
-
-            switch (id) {
-                case 'gemini-ai': bootstrapGeminiAI(root); break;
-                case 'imagen-studio': bootstrapImagenStudio(root); break;
-                case 'terminal': bootstrapTerminal(root); break;
-                case 'paint': bootstrapPaint(root); break;
-                case 'notepad': bootstrapNotepad(root); break;
-                case 'explorer': bootstrapExplorer(root); break;
-                case 'settings': bootstrapSettings(root); break;
-                case 'calculator': bootstrapCalculator(root); break;
-                case 'browser': bootstrapBrowser(root); break;
-                case 'weather': bootstrapWeather(root); break;
-            }
+            if (id === 'explorer') bootstrapExplorer(root);
+            if (id === 'gemini-ai') bootstrapGeminiAI(root);
+            if (id === 'imagen-studio') bootstrapImagenStudio(root);
+            if (id === 'terminal') bootstrapTerminal(root);
+            if (id === 'paint') bootstrapPaint(root);
+            if (id === 'notepad') bootstrapNotepad(root);
+            if (id === 'browser') bootstrapBrowser(root);
+            if (id === 'weather') bootstrapWeather(root);
+            if (id === 'settings') bootstrapSettings(root);
         }
 
-        // ================= REAL-TIME GOOGLE SEARCH ENGINE BROWSER =================
-        function bootstrapBrowser(el) {
-            const loader = el.querySelector('.browser-loader');
-            const searchForm = el.querySelector('.browser-search-form');
-            const searchInput = el.querySelector('.browser-search-input');
-            const homeLayout = el.querySelector('.browser-home-layout');
-            const resultsLayout = el.querySelector('.browser-results-layout');
-            const addressInput = el.querySelector('.browser-url-input');
-
-            const groundedSummary = el.querySelector('.browser-grounded-summary');
-            const groundedLinks = el.querySelector('.browser-grounded-links');
-
-            const resetToHome = () => {
-                homeLayout.classList.remove('hidden');
-                resultsLayout.classList.add('hidden');
-                addressInput.value = "https://google.engine.nebula";
-            };
-
-            el.querySelector('.browser-home-btn').addEventListener('click', resetToHome);
-            el.querySelector('.browser-refresh-btn').addEventListener('click', () => {
-                if (!homeLayout.classList.contains('hidden')) return;
-                searchForm.dispatchEvent(new Event('submit'));
-            });
-
-            searchForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const q = searchInput.value.trim();
-                if (!q) return;
-
-                loader.classList.remove('hidden');
-                playSysSound('click');
-
-                addressInput.value = `https://google.engine.nebula/search?q=${encodeURIComponent(q)}`;
-
-                try {
-                    const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                    const prompt = `Perform a comprehensive search and compile search engine summaries matching user query: "${q}". Include search engine summaries, details, dates, and useful descriptions in standard Markdown formatting.`;
-                    
-                    const payload = {
-                        contents: [{ parts: [{ text: prompt }] }],
-                        tools: [{ "google_search": {} }],
-                        systemInstruction: {
-                            parts: [{ text: "You are the Google Search Grounding Engine. Respond back with deep real-time web summaries based on organic search, adding dates and structured facts with elegant phrasing. Emojis welcome." }]
-                        }
-                    };
-
-                    const response = await fetch(apiURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
-                    loader.classList.add('hidden');
-
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    const attributions = result.candidates?.[0]?.groundingMetadata?.groundingAttributions || [];
-
-                    if (text) {
-                        homeLayout.classList.add('hidden');
-                        resultsLayout.classList.remove('hidden');
-
-                        // Convert Markdown styling to basic HTML
-                        const formattedText = text
-                            .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-gray-900">$1</strong>')
-                            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                            .replace(/`([^`]+)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-red-600 text-xs">$1</code>')
-                            .replace(/\n/g, '<br>');
-
-                        groundedSummary.innerHTML = formattedText;
-
-                        // Attributions linking
-                        groundedLinks.innerHTML = '';
-                        if (attributions.length > 0) {
-                            attributions.forEach((attr) => {
-                                const uri = attr.web?.uri;
-                                const title = attr.web?.title;
-                                if (uri && title) {
-                                    const card = document.createElement('div');
-                                    card.className = "p-3 bg-gray-50 border hover:bg-purple-50 hover:border-purple-200 transition-colors rounded-xl flex flex-col";
-                                    card.innerHTML = `
-                                        <span class="text-[10px] text-green-700 tracking-wider font-mono truncate">${uri}</span>
-                                        <a href="${uri}" target="_blank" class="text-sm font-semibold text-blue-600 hover:underline mt-0.5">${title}</a>
-                                        <span class="text-xs text-gray-500 mt-1">Real-time match derived from search. Click to browse.</span>
-                                    `;
-                                    groundedLinks.appendChild(card);
-                                }
-                            });
-                        } else {
-                            groundedLinks.innerHTML = '<p class="text-xs text-gray-400">Deep local knowledge search completed. Attributions matching indices are hidden by origin rules.</p>';
-                        }
-                    } else {
-                        throw new Error("Empty satellite feedback");
-                    }
-                } catch (err) {
-                    loader.classList.add('hidden');
-                    showNotification("Search Network Error", "Failed to retrieve grounded results. Check offline modules.", "error");
-                }
-            });
-        }
-
-        // ================= ACCURATE WEATHER APP RETRIEVER =================
-        function bootstrapWeather(el) {
-            const form = el.querySelector('.weather-location-form');
-            const cityInput = el.querySelector('.weather-city-input');
-            const loader = el.querySelector('.weather-loader');
-            const promptView = el.querySelector('.weather-prompt-view');
-            const statsView = el.querySelector('.weather-stats-view');
-
-            const refreshWeather = async (city) => {
-                loader.classList.remove('hidden');
-                playSysSound('click');
-
-                try {
-                    const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                    const prompt = `Return the live weather stats for "${city}" strictly formatted in application/json. Use this exact schema:
-                    {
-                      "city": "City Name",
-                      "temperature": 18,
-                      "condition": "Cloudy",
-                      "high": 22,
-                      "low": 12,
-                      "wind": "15 km/h",
-                      "humidity": "60%",
-                      "precipitation": "20%",
-                      "iconEmoji": "⛅"
-                    }`;
-
-                    const payload = {
-                        contents: [{ parts: [{ text: prompt }] }],
-                        tools: [{ "google_search": {} }],
-                        generationConfig: {
-                            responseMimeType: "application/json"
-                        }
-                    };
-
-                    const response = await fetch(apiURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
-                    loader.classList.add('hidden');
-
-                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (jsonText) {
-                        const weather = JSON.parse(jsonText);
-                        
-                        // Populate widgets
-                        el.querySelector('.weather-city-name').textContent = weather.city;
-                        el.querySelector('.weather-temp').textContent = `${weather.temperature}°C`;
-                        el.querySelector('.weather-condition').textContent = weather.condition;
-                        el.querySelector('.weather-range').textContent = `H: ${weather.high}°C  L: ${weather.low}°C`;
-                        el.querySelector('.weather-wind').textContent = weather.wind;
-                        el.querySelector('.weather-humidity').textContent = weather.humidity;
-                        el.querySelector('.weather-precip').textContent = weather.precipitation;
-                        el.querySelector('.weather-icon-badge').textContent = weather.iconEmoji || "☁️";
-
-                        // Animate backgrounds
-                        const conditionStr = weather.condition.toLowerCase();
-                        const card = el.querySelector('.weather-stats-view').parentElement;
-                        card.className = "h-full w-full flex flex-col text-white font-sans overflow-hidden bg-gradient-to-b";
-                        
-                        if (conditionStr.includes('sun') || conditionStr.includes('clear')) {
-                            card.classList.add('from-yellow-600', 'to-orange-950');
-                        } else if (conditionStr.includes('rain') || conditionStr.includes('shower') || conditionStr.includes('storm')) {
-                            card.classList.add('from-slate-700', 'to-neutral-900');
-                        } else if (conditionStr.includes('snow') || conditionStr.includes('freeze')) {
-                            card.classList.add('from-blue-700', 'to-slate-900');
-                        } else {
-                            card.classList.add('from-blue-900', 'to-indigo-950');
-                        }
-
-                        promptView.classList.add('hidden');
-                        statsView.classList.remove('hidden');
-                        showNotification("Weather Synced ✅", `Forecast coordinates mapped for ${weather.city}.`, "success");
-                    } else {
-                        throw new Error("Incomplete json feedback");
-                    }
-                } catch (err) {
-                    loader.classList.add('hidden');
-                    showNotification("Meteorological Fail 🌨️", "Ensure coordinates or query names exist correctly.", "error");
-                }
-            };
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const city = cityInput.value.trim();
-                if (city) refreshWeather(city);
-            });
-
-            el.querySelector('.weather-change-city-btn').addEventListener('click', async () => {
-                const targetCity = await sysPrompt("Change Location 📍", "Enter city to scan:", "Berlin");
-                if (targetCity) refreshWeather(targetCity);
-            });
-        }
-
-        // Global Prompter Helpers mapping dialog system
-        function sysPrompt(title, message, defaultValue = "") {
-            return sysDialog(title, message, true, defaultValue);
-        }
-
-
-        // ================= GEMINI AI CORE CHATBOT =================
-        function bootstrapGeminiAI(el) {
-            const logs = el.querySelector('.chat-logs');
-            const form = el.querySelector('.ai-chat-form');
-            const input = el.querySelector('.ai-input');
-            const clear = el.querySelector('.clear-ai-chat');
-
-            clear.addEventListener('click', () => {
-                logs.innerHTML = '';
-                showNotification("AI buffer cleared", "Context erased.", "info");
-            });
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const text = input.value.trim();
-                if (!text) return;
-
-                const userBubble = document.createElement('div');
-                userBubble.className = "flex gap-3 bg-purple-950/20 p-3 rounded-xl border border-purple-500/10 justify-end text-right";
-                userBubble.innerHTML = `
-                    <div class="flex-1">
-                        <h4 class="font-bold text-purple-300 text-xs">${currentActiveUser}</h4>
-                        <p class="mt-1 text-gray-200 select-text">${text}</p>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white"><i class="fa-solid fa-user-astronaut"></i></div>
-                `;
-                logs.appendChild(userBubble);
-                input.value = '';
-                logs.scrollTop = logs.scrollHeight;
-
-                const thinkBubble = document.createElement('div');
-                thinkBubble.className = "flex gap-3 bg-white/5 p-3 rounded-xl border border-white/5 animate-pulse";
-                thinkBubble.innerHTML = `
-                    <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white"><i class="fa-solid fa-robot"></i></div>
-                    <div class="flex-1 space-y-1">
-                        <div class="h-2 bg-gray-700 rounded w-1/4"></div>
-                        <div class="h-2 bg-gray-700 rounded w-1/2"></div>
-                    </div>
-                `;
-                logs.appendChild(thinkBubble);
-                logs.scrollTop = logs.scrollHeight;
-
-                try {
-                    const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                    const payload = {
-                        contents: [{ parts: [{ text: text }] }],
-                        systemInstruction: {
-                            parts: [{ text: "You are Gemini Core integrated inside NebulaOS. Respond with intelligent advice, markdown styling code blocks and technical depth." }]
-                        }
-                    };
-
-                    const res = await fetch(apiURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const data = await res.json();
-                    thinkBubble.remove();
-
-                    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Satellite connection timed out. Check environment ports.";
-                    const formattedText = responseText
-                        .replace(/```([\s\S]*?)```/g, '<pre class="bg-black/40 p-3 rounded-lg border border-white/5 font-code text-xs text-green-300 overflow-x-auto my-2 select-text">$1</pre>')
-                        .replace(/\n/g, '<br>');
-
-                    const aiBubble = document.createElement('div');
-                    aiBubble.className = "flex gap-3 bg-white/5 p-3 rounded-xl border border-white/5";
-                    aiBubble.innerHTML = `
-                        <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white"><i class="fa-solid fa-robot"></i></div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-indigo-400 text-xs">Nebula AI Core</h4>
-                            <div class="mt-1 text-gray-200 leading-relaxed select-text">${formattedText}</div>
-                        </div>
-                    `;
-                    logs.appendChild(aiBubble);
-                    playSysSound('success');
-                } catch (e) {
-                    thinkBubble.remove();
-                    showNotification("AI core timeout", "Check offline connectivity options.", "error");
-                }
-                logs.scrollTop = logs.scrollHeight;
-            });
-        }
-
-        // ================= IMAGEN STUDY STUDIOS =================
-        function bootstrapImagenStudio(el) {
-            const form = el.querySelector('.imagen-generator-form');
-            const input = el.querySelector('.imagen-input');
-            const loader = el.querySelector('.imagen-loader');
-            const previewImg = el.querySelector('.imagen-output-img');
-            const placeholder = el.querySelector('.imagen-placeholder-info');
-            const saveBtn = el.querySelector('.imagen-save-to-vfs');
-
-            let imageB64 = null;
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const q = input.value.trim();
-                if (!q) return;
-
-                loader.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-                previewImg.classList.add('hidden');
-                saveBtn.classList.add('hidden');
-                playSysSound('click');
-
-                try {
-                    const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-                    const payload = {
-                        instances: { prompt: q },
-                        parameters: { sampleCount: 1 }
-                    };
-
-                    const res = await fetch(apiURL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const data = await res.json();
-                    loader.classList.add('hidden');
-
-                    const b64 = data.predictions?.[0]?.bytesBase64Encoded;
-                    if (b64) {
-                        imageB64 = `data:image/png;base64,${b64}`;
-                        previewImg.src = imageB64;
-                        previewImg.classList.remove('hidden');
-                        saveBtn.classList.remove('hidden');
-                        showNotification("Artwork Synthesized!", "Imagen loaded successfully.", "success");
-                    } else {
-                        throw new Error();
-                    }
-                } catch (err) {
-                    loader.classList.add('hidden');
-                    placeholder.classList.remove('hidden');
-                    showNotification("Art rendering error", "Imagen modules failed.", "error");
-                }
-            });
-
-            saveBtn.addEventListener('click', async () => {
-                if (!imageB64) return;
-                const name = await sysPrompt("Save Sketch 💾", "Enter customized filename:", `art_${Date.now()}.png`);
-                if (name) {
-                    const fullName = name.endsWith('.png') ? name : `${name}.png`;
-                    VFS['/drawings'].push({ name: fullName, type: 'image', content: imageB64 });
-                    showNotification("File saved", `${fullName} cataloged inside sketches.`, "success");
-                    const explorer = openWindowsList.find(w => w.appId === 'explorer');
-                    if (explorer) bootstrapExplorer(explorer.element);
-                }
-            });
-        }
-
-        // ================= SYSTEM SHELL TERMINAL =================
-        function bootstrapTerminal(el) {
-            const history = el.querySelector('.terminal-history');
-            const input = el.querySelector('.terminal-input');
-
-            el.addEventListener('click', () => input.focus());
-
-            const printLine = (text, classColor = "text-green-300") => {
-                const line = document.createElement('p');
-                line.className = `${classColor} select-text font-code`;
-                line.innerHTML = text;
-                history.appendChild(line);
-                history.scrollTop = history.scrollHeight;
-            };
-
-            input.addEventListener('keydown', async (e) => {
-                if (e.key === 'Enter') {
-                    const val = input.value.trim();
-                    input.value = '';
-                    if (!val) return;
-
-                    printLine(`<span class="text-pink-400 font-bold">guest@nebula-os:~$</span> ${val}`);
-                    playSysSound('click');
-
-                    const args = val.split(' ');
-                    const cmd = args[0].toLowerCase();
-
-                    switch (cmd) {
-                        case 'help':
-                            printLine("Available Directives:");
-                            printLine("  ls        - Query filesystem records 📂");
-                            printLine("  neofetch  - Fetch technical graphics spec 🖥️");
-                            printLine("  whoami    - Show currently active user profile 👥");
-                            printLine("  clear     - Wipe shell visual buffer 🧼");
-                            printLine("  sysinfo   - Queries system health indicators ⚙️");
-                            break;
-                        case 'ls':
-                            printLine("Listing Files inside Root path [/]:");
-                            VFS['/'].forEach(f => printLine(`  📄 ${f.name}   [${f.content.length} characters]`, "text-purple-400"));
-                            break;
-                        case 'neofetch':
-                            printLine(`
-   .---.     OS: NebulaOS Ultra v4.0.0
-  /     \\    Hardware: Virtual Node N-4.0
-  \\\\   //    V-RAM Stack: 8.0GB Allocated
-   \\   /     Active Profile: ${currentActiveUser}
-  /_____\\    Network: ${isWifiSimConnected ? currentWifiSimSSID : "OFFLINE"}
-                            `, "text-indigo-300");
-                            break;
-                        case 'whoami':
-                            printLine(`Currently authenticated as: ${currentActiveUser}`, "text-yellow-400");
-                            break;
-                        case 'clear':
-                            history.innerHTML = '';
-                            break;
-                        case 'sysinfo':
-                            printLine("Core Matrix Health Indicators: Optimal [OK]");
-                            printLine(`Host Node Architecture: ${navigator.platform}`);
-                            break;
-                        default:
-                            printLine(`Directives mismatch error: "${cmd}" is not valid.`, "text-red-400");
-                    }
-                }
-            });
-        }
-
-
-        // ================= CANVAS DRAWING PAINT APPS =================
-        function bootstrapPaint(el) {
-            const canvas = el.querySelector('.paint-canvas');
-            const ctx = canvas.getContext('2d');
-            const colorPicker = el.querySelector('.paint-color-picker');
-            const sizeSlider = el.querySelector('.paint-brush-size');
-            const eraser = el.querySelector('.paint-tool-eraser');
-            const clear = el.querySelector('.paint-tool-clear');
-            const save = el.querySelector('.paint-save-to-vfs');
-
-            canvas.width = 460;
-            canvas.height = 280;
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            let activeDrawing = false;
-            let size = sizeSlider.value;
-            let color = colorPicker.value;
-            let isEraser = false;
-
-            let lastX = 0, lastY = 0;
-
-            const mapCoordinates = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-                const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-                return {
-                    x: (clientX - rect.left) * (canvas.width / rect.width),
-                    y: (clientY - rect.top) * (canvas.height / rect.height)
-                };
-            };
-
-            const draw = (e) => {
-                if (!activeDrawing) return;
-                e.preventDefault();
-                const { x, y } = mapCoordinates(e);
-
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(x, y);
-                ctx.strokeStyle = isEraser ? '#ffffff' : color;
-                ctx.lineWidth = size;
-                ctx.lineCap = 'round';
-                ctx.stroke();
-
-                lastX = x;
-                lastY = y;
-            };
-
-            canvas.addEventListener('mousedown', (e) => {
-                activeDrawing = true;
-                const { x, y } = mapCoordinates(e);
-                lastX = x; lastY = y;
-            });
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', () => activeDrawing = false);
-            canvas.addEventListener('mouseleave', () => activeDrawing = false);
-
-            canvas.addEventListener('touchstart', (e) => {
-                activeDrawing = true;
-                const { x, y } = mapCoordinates(e);
-                lastX = x; lastY = y;
-            }, { passive: true });
-            canvas.addEventListener('touchmove', draw, { passive: false });
-            canvas.addEventListener('touchend', () => activeDrawing = false);
-
-            colorPicker.addEventListener('input', (e) => {
-                color = e.target.value;
-                isEraser = false;
-                eraser.classList.remove('bg-purple-600/20');
-            });
-
-            sizeSlider.addEventListener('input', (e) => size = e.target.value);
-
-            eraser.addEventListener('click', () => {
-                isEraser = !isEraser;
-                eraser.classList.toggle('bg-purple-600/20', isEraser);
-                playSysSound('click');
-            });
-
-            clear.addEventListener('click', () => {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                playSysSound('click');
-            });
-
-            save.addEventListener('click', async () => {
-                const b64 = canvas.toDataURL();
-                const name = await sysPrompt("Save Sketch 🎨", "Enter custom drawing name:", `drawing_${Date.now()}.png`);
-                if (name) {
-                    const fullName = name.endsWith('.png') ? name : `${name}.png`;
-                    VFS['/drawings'].push({ name: fullName, type: 'image', content: b64 });
-                    showNotification("Saved!", `${fullName} committed to /drawings folders.`, "success");
-                    const explorer = openWindowsList.find(w => w.appId === 'explorer');
-                    if (explorer) bootstrapExplorer(explorer.element);
-                }
-            });
-        }
-
-        // ================= TEXT NOTEPAD EDITORS =================
-        function bootstrapNotepad(el) {
-            const textarea = el.querySelector('.notepad-textarea');
-            const fileLabel = el.querySelector('.notepad-filename');
-            const countLabel = el.querySelector('.notepad-char-count');
-
-            let currentFileName = "untitled.txt";
-
-            textarea.addEventListener('input', () => countLabel.textContent = `${textarea.value.length} characters`);
-
-            el.querySelector('.notepad-new').addEventListener('click', () => {
-                textarea.value = '';
-                currentFileName = "untitled.txt";
-                fileLabel.textContent = currentFileName;
-                countLabel.textContent = "0 characters";
-                playSysSound('click');
-            });
-
-            el.querySelector('.notepad-save').addEventListener('click', async () => {
-                const val = textarea.value.trim();
-                if (!val) {
-                    showNotification("Empty Document", "Please type something before committing.", "error");
-                    return;
-                }
-
-                const customName = await sysPrompt("Save Document 💾", "Enter customized filename:", currentFileName);
-                if (customName) {
-                    currentFileName = customName.endsWith('.txt') ? customName : `${customName}.txt`;
-                    
-                    const folder = VFS['/docs'];
-                    const idx = folder.findIndex(f => f.name === currentFileName);
-                    if (idx !== -1) {
-                        folder[idx].content = val;
-                    } else {
-                        folder.push({ name: currentFileName, type: 'text', content: val });
-                    }
-
-                    fileLabel.textContent = currentFileName;
-                    showNotification("Commit Success ✅", `${currentFileName} successfully cataloged inside Docs space.`, "success");
-                    
-                    const explorer = openWindowsList.find(w => w.appId === 'explorer');
-                    if (explorer) bootstrapExplorer(explorer.element);
-                }
-            });
-
-            el.querySelector('.notepad-export').addEventListener('click', () => {
-                const blob = new Blob([textarea.value], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = currentFileName;
-                link.click();
-                URL.revokeObjectURL(url);
-                showNotification("Export Complete 📥", "Downloaded files to guest host system.", "success");
-            });
-        }
-
-        // ================= VIRTUAL FILE DISK EXPLORER =================
+        // --- APP LOGIC IMPLEMENTATIONS ---
+        
         function bootstrapExplorer(el) {
             const grid = el.querySelector('.explorer-files-grid');
-            const currDir = el.querySelector('.explorer-curr-dir');
-            let currentPath = "/";
+            const sidebar = el.querySelector('.explorer-sidebar');
+            let currPath = "/";
 
-            const renderDir = (path) => {
-                currentPath = path;
-                currDir.textContent = path;
+            const render = (path) => {
+                currPath = path; el.querySelector('.explorer-curr-dir').textContent = path;
                 grid.innerHTML = '';
+                sidebar.innerHTML = '<span class="text-gray-500 font-bold uppercase tracking-widest text-[9px] mb-2">Virtual Disk</span>';
+                
+                Object.keys(VFS).forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-full text-left px-2 py-1.5 rounded-md flex items-center gap-1.5 text-xs ${currPath === p ? 'bg-white/5 text-white border-l-2 border-purple-500' : 'hover:bg-white/5 text-gray-400'}`;
+                    btn.innerHTML = `<span>${p==='/'?'🏠':p==='/docs'?'📄':p==='/drawings'?'🎨':'📂'}</span><span class="truncate">${p==='/'?'Root':p.substring(1)}</span>`;
+                    btn.onclick = () => render(p);
+                    sidebar.appendChild(btn);
+                });
 
-                const folder = VFS[path] || [];
-                if (folder.length === 0) {
-                    grid.innerHTML = '<p class="col-span-3 text-center text-xs text-gray-500 py-10">Folder is empty.</p>';
-                    return;
-                }
-
-                folder.forEach(file => {
+                const files = VFS[path] || [];
+                if(files.length === 0) { grid.innerHTML = '<p class="col-span-3 text-center text-gray-500 py-10 text-xs">Folder is empty.</p>'; return; }
+                
+                files.forEach(f => {
                     const card = document.createElement('div');
-                    card.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 cursor-pointer text-center group transition-all";
-                    let iconEmoji = "📄";
-                    if (file.type === 'image') iconEmoji = "🎨";
-
-                    card.innerHTML = `
-                        <div class="text-3xl mb-1">${iconEmoji}</div>
-                        <div class="text-xs font-semibold text-gray-200 truncate w-full select-none">${file.name}</div>
-                    `;
-
-                    card.addEventListener('click', () => {
+                    card.className = "flex flex-col items-center p-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 cursor-pointer text-center";
+                    card.innerHTML = `<div class="text-3xl mb-1">${f.type === 'image' ? '🎨' : '📄'}</div><div class="text-xs font-semibold truncate w-full text-gray-200">${f.name}</div>`;
+                    card.onclick = () => {
                         playSysSound('click');
-                        if (file.type === 'text') {
+                        if (f.type === 'text') {
                             launchApp('notepad');
                             setTimeout(() => {
-                                const win = openWindowsList.find(w => w.appId === 'notepad');
-                                if (win) {
-                                    const notepadRoot = win.element;
-                                    notepadRoot.querySelector('.notepad-textarea').value = file.content;
-                                    notepadRoot.querySelector('.notepad-filename').textContent = file.name;
-                                    notepadRoot.querySelector('.notepad-char-count').textContent = `${file.content.length} characters`;
-                                }
+                                const nw = openWindowsList.find(w => w.appId === 'notepad');
+                                if(nw) { nw.element.querySelector('.notepad-textarea').value = f.content; nw.element.querySelector('.notepad-filename').textContent = f.name; }
                             }, 200);
-                        } else if (file.type === 'image') {
-                            // pop-out viewer
-                            const viewFrame = document.createElement('div');
-                            viewFrame.className = "absolute inset-0 bg-black/85 z-[1000] flex flex-col items-center justify-center p-4";
-                            viewFrame.innerHTML = `
-                                <div class="max-w-md w-full border border-white/10 rounded-2xl overflow-hidden bg-neutral-900 shadow-2xl relative flex flex-col">
-                                    <div class="p-3 bg-neutral-950 flex items-center justify-between text-xs text-white">
-                                        <span>Viewing Image: ${file.name}</span>
-                                        <button class="close-image-viewer-btn font-bold text-gray-400 hover:text-white px-2 text-sm">×</button>
-                                    </div>
-                                    <img src="${file.content}" class="w-full h-auto max-h-[360px] object-contain bg-white">
-                                </div>
-                            `;
-                            viewFrame.querySelector('.close-image-viewer-btn').onclick = () => viewFrame.remove();
-                            document.getElementById('desktop-env').appendChild(viewFrame);
+                        } else if (f.type === 'image') {
+                            const v = document.createElement('div'); v.className = "absolute inset-0 bg-black/85 z-[1000] flex items-center justify-center p-4";
+                            v.innerHTML = `<div class="max-w-md w-full bg-neutral-900 border border-white/10 rounded-xl overflow-hidden"><div class="p-2 bg-neutral-950 flex justify-between text-xs text-white"><span>${f.name}</span><button class="px-2 font-bold" onclick="this.closest('.absolute').remove()">×</button></div><img src="${f.content}" class="w-full bg-white"></div>`;
+                            document.getElementById('desktop-env').appendChild(v);
                         }
-                    });
-
+                    };
                     grid.appendChild(card);
                 });
             };
-
-            el.querySelectorAll('.explorer-dir-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const dir = e.currentTarget.dataset.dir;
-                    el.querySelectorAll('.explorer-dir-btn').forEach(b => {
-                        b.classList.remove('bg-white/5', 'text-white', 'border-l-2', 'border-purple-500');
-                        b.classList.add('hover:bg-white/5', 'text-gray-300');
-                    });
-                    e.currentTarget.classList.add('bg-white/5', 'text-white', 'border-l-2', 'border-purple-500');
-                    e.currentTarget.classList.remove('hover:bg-white/5', 'text-gray-300');
-                    playSysSound('click');
-                    renderDir(dir);
-                });
-            });
-
-            renderDir('/');
+            render('/');
         }
 
-        // ================= SETTINGS PANEL & WIFI SCANNER =================
-        function bootstrapSettings(el) {
-            const views = el.querySelectorAll('.settings-tab-view');
-            const btns = el.querySelectorAll('.settings-nav-btn');
-
-            btns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const target = e.currentTarget.dataset.tab;
-                    btns.forEach(b => {
-                        b.classList.remove('bg-white/5', 'text-white', 'border-l-2', 'border-purple-500');
-                        b.classList.add('hover:bg-white/5', 'text-gray-400');
+        function bootstrapGeminiAI(el) {
+            const logs = el.querySelector('.chat-logs'), form = el.querySelector('.ai-chat-form'), inp = el.querySelector('.ai-input');
+            el.querySelector('.clear-ai-chat').onclick = () => logs.innerHTML = '';
+            form.onsubmit = async (e) => {
+                e.preventDefault(); const t = inp.value.trim(); if(!t) return;
+                logs.innerHTML += `<div class="flex gap-3 bg-purple-950/20 p-3 rounded-xl border border-purple-500/10 justify-end text-right"><div class="flex-1"><h4 class="font-bold text-purple-300 text-xs">${currentActiveUser}</h4><p class="mt-1 text-gray-200">${t}</p></div><div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center">👽</div></div>`;
+                inp.value = ''; logs.scrollTop = logs.scrollHeight;
+                const thnk = document.createElement('div'); thnk.className = "flex gap-3 bg-white/5 p-3 rounded-xl animate-pulse"; thnk.innerHTML = `<div class="w-8 h-8 rounded-full bg-purple-600"></div><div class="flex-1 space-y-1"><div class="h-2 bg-gray-700 w-1/4"></div></div>`; logs.appendChild(thnk); logs.scrollTop = logs.scrollHeight;
+                
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] })
                     });
-                    e.currentTarget.classList.add('bg-white/5', 'text-white', 'border-l-2', 'border-purple-500');
-                    e.currentTarget.classList.remove('hover:bg-white/5', 'text-gray-400');
-
-                    views.forEach(v => v.classList.add('hidden'));
-                    el.querySelector(`#${target}`).classList.remove('hidden');
-                    playSysSound('click');
-                });
-            });
-
-            // Theme wallpapers
-            el.querySelectorAll('.settings-theme-btn').forEach(themeBtn => {
-                themeBtn.addEventListener('click', (e) => {
-                    const grad = e.currentTarget.dataset.gradient;
-                    document.getElementById('desktop-env').style.backgroundImage = grad;
-                    el.querySelectorAll('.settings-theme-btn').forEach(b => b.classList.replace('border-purple-500', 'border-white/10'));
-                    e.currentTarget.classList.replace('border-white/10', 'border-purple-500');
+                    const d = await res.json(); thnk.remove();
+                    const txt = d.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+                    logs.innerHTML += `<div class="flex gap-3 bg-white/5 p-3 rounded-xl border border-white/5"><div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white">🤖</div><div class="flex-1"><h4 class="font-bold text-indigo-400 text-xs">AI Core</h4><div class="mt-1 text-gray-200 text-xs">${txt.replace(/\n/g, '<br>')}</div></div></div>`;
                     playSysSound('success');
-                });
-            });
+                } catch (err) { thnk.remove(); showNotification("Error", "AI request failed.", "error"); }
+                logs.scrollTop = logs.scrollHeight;
+            };
+        }
 
-            el.querySelector('#settings-sound-toggle').addEventListener('change', (e) => {
-                isSoundFXEnabled = e.target.checked;
-                playSysSound('click');
-            });
+        function bootstrapImagenStudio(el) {
+            const form = el.querySelector('.imagen-generator-form'), inp = el.querySelector('.imagen-input'), ldr = el.querySelector('.imagen-loader'), img = el.querySelector('.imagen-output-img'), save = el.querySelector('.imagen-save-to-vfs');
+            let b64 = null;
+            form.onsubmit = async (e) => {
+                e.preventDefault(); const q = inp.value.trim(); if(!q) return;
+                ldr.classList.remove('hidden'); img.classList.add('hidden'); save.classList.add('hidden'); el.querySelector('.imagen-placeholder-info').classList.add('hidden');
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ instances: { prompt: q }, parameters: { sampleCount: 1 } })
+                    });
+                    const d = await res.json(); ldr.classList.add('hidden');
+                    if (d.predictions?.[0]?.bytesBase64Encoded) {
+                        b64 = `data:image/png;base64,${d.predictions[0].bytesBase64Encoded}`; img.src = b64; img.classList.remove('hidden'); save.classList.remove('hidden'); playSysSound('success');
+                    }
+                } catch(e) { ldr.classList.add('hidden'); showNotification("Error", "Generation failed", "error"); }
+            };
+            save.onclick = async () => {
+                const name = await sysDialog("Save Image", "Filename:", true, `img_${Date.now()}.png`);
+                if(name) { VFS['/drawings'].push({ name: name.endsWith('.png')?name:name+'.png', type: 'image', content: b64 }); showNotification("Saved", "Saved to Drawings", "success"); }
+            };
+        }
 
-            // WiFi Simulator logic
-            const wifiNetworks = ["Nebula_Cosmos_Net", "Andromeda_5G", "Orion_Space_Cloud", "Starbucks_WiFI"];
+        function bootstrapTerminal(el) {
+            const hist = el.querySelector('.terminal-history'), inp = el.querySelector('.terminal-input');
+            el.onclick = () => inp.focus();
+            inp.onkeydown = (e) => {
+                if(e.key === 'Enter') {
+                    const v = inp.value.trim(); inp.value = ''; if(!v) return;
+                    hist.innerHTML += `<p class="text-green-300 font-code"><span class="text-pink-400">guest@nebula:~$</span> ${v}</p>`;
+                    const cmd = v.split(' ')[0].toLowerCase();
+                    if(cmd==='help') hist.innerHTML += `<p class="text-gray-400">Commands: ls, clear, whoami, neofetch</p>`;
+                    else if(cmd==='ls') Object.keys(VFS).forEach(k => hist.innerHTML += `<p class="text-purple-300">${k}</p>`);
+                    else if(cmd==='clear') hist.innerHTML = '';
+                    else if(cmd==='whoami') hist.innerHTML += `<p class="text-yellow-400">${currentActiveUser}</p>`;
+                    else if(cmd==='neofetch') hist.innerHTML += `<p class="text-indigo-300">OS: Nebula v4.0<br>User: ${currentActiveUser}</p>`;
+                    else hist.innerHTML += `<p class="text-red-400">Unknown command: ${cmd}</p>`;
+                    hist.scrollTop = hist.scrollHeight; playSysSound('click');
+                }
+            };
+        }
+
+        function bootstrapNotepad(el) {
+            const t = el.querySelector('.notepad-textarea'), c = el.querySelector('.notepad-char-count'), fl = el.querySelector('.notepad-filename');
+            let fn = "untitled.txt";
+            t.oninput = () => c.textContent = `${t.value.length} chars`;
+            el.querySelector('.notepad-new').onclick = () => { t.value = ''; fn = "untitled.txt"; fl.textContent = fn; c.textContent = "0 chars"; };
+            el.querySelector('.notepad-save').onclick = async () => {
+                if(!t.value.trim()) return showNotification("Empty", "Nothing to save", "error");
+                const name = await sysDialog("Save Text", "Filename:", true, fn);
+                if(name) { fn = name.endsWith('.txt')?name:name+'.txt'; const f = VFS['/docs']; const i = f.findIndex(x=>x.name===fn); if(i>-1) f[i].content=t.value; else f.push({name:fn, type:'text', content:t.value}); fl.textContent = fn; showNotification("Saved", "Saved to /docs", "success"); }
+            };
+        }
+
+        function bootstrapPaint(el) {
+            const cvs = el.querySelector('.paint-canvas'), ctx = cvs.getContext('2d'), cp = el.querySelector('.paint-color-picker'), sl = el.querySelector('.paint-brush-size');
+            cvs.width = 460; cvs.height = 280; ctx.fillStyle = "#fff"; ctx.fillRect(0,0,460,280);
+            let draw = false, er = false, lx=0, ly=0;
+            const getC = (e) => { const r = cvs.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: (cx - r.left) * (460/r.width), y: (cy - r.top) * (280/r.height) }; };
+            const mv = (e) => { if(!draw) return; e.preventDefault(); const {x,y} = getC(e); ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(x,y); ctx.strokeStyle = er ? '#fff' : cp.value; ctx.lineWidth = sl.value; ctx.lineCap = 'round'; ctx.stroke(); lx=x; ly=y; };
+            cvs.onmousedown = (e) => { draw=true; const {x,y} = getC(e); lx=x; ly=y; }; cvs.onmousemove = mv; cvs.onmouseup = () => draw=false; cvs.onmouseleave = () => draw=false;
+            el.querySelector('.paint-tool-eraser').onclick = function() { er = !er; this.classList.toggle('bg-white/5'); this.classList.toggle('bg-purple-600/30'); };
+            el.querySelector('.paint-tool-clear').onclick = () => { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,460,280); };
+            el.querySelector('.paint-save-to-vfs').onclick = async () => { const n = await sysDialog("Save Drawing", "Filename:", true, `draw_${Date.now()}.png`); if(n){ const fn = n.endsWith('.png')?n:n+'.png'; VFS['/drawings'].push({name:fn, type:'image', content:cvs.toDataURL()}); showNotification("Saved", "Saved to /drawings", "success"); } };
+        }
+
+        function bootstrapBrowser(el) {
+            const f = el.querySelector('.browser-search-form'), i = el.querySelector('.browser-search-input'), l = el.querySelector('.browser-loader'), hl = el.querySelector('.browser-home-layout'), rl = el.querySelector('.browser-results-layout'), u = el.querySelector('.browser-url-input');
+            el.querySelector('.browser-home-btn').onclick = () => { hl.classList.remove('hidden'); rl.classList.add('hidden'); u.value="https://google.engine.nebula"; };
+            f.onsubmit = async (e) => {
+                e.preventDefault(); const q = i.value.trim(); if(!q) return;
+                l.classList.remove('hidden'); u.value = `https://google.engine.nebula/search?q=${encodeURIComponent(q)}`;
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: `Summarize Google Search for: "${q}"` }] }], tools: [{ "google_search": {} }] })
+                    });
+                    const d = await res.json(); l.classList.add('hidden'); hl.classList.add('hidden'); rl.classList.remove('hidden');
+                    const txt = d.candidates?.[0]?.content?.parts?.[0]?.text || "No results";
+                    el.querySelector('.browser-grounded-summary').innerHTML = txt.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                    const links = el.querySelector('.browser-grounded-links'); links.innerHTML = '';
+                    (d.candidates?.[0]?.groundingMetadata?.groundingAttributions || []).forEach(a => {
+                        if(a.web?.uri) links.innerHTML += `<div class="p-2 border rounded text-xs"><a href="${a.web.uri}" target="_blank" class="text-blue-500 hover:underline">${a.web.title}</a></div>`;
+                    });
+                    playSysSound('success');
+                } catch(err) { l.classList.add('hidden'); showNotification("Error", "Search failed.", "error"); }
+            };
+        }
+
+        function bootstrapWeather(el) {
+            el.querySelector('.weather-location-form').onsubmit = async (e) => {
+                e.preventDefault(); const c = el.querySelector('.weather-city-input').value.trim(); if(!c) return;
+                el.querySelector('.weather-loader').classList.remove('hidden');
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: `Return weather for ${c} as JSON: {city, temp, condition, wind, humidity, precip, iconEmoji}` }] }], generationConfig: { responseMimeType: "application/json" } })
+                    });
+                    const d = await res.json(); el.querySelector('.weather-loader').classList.add('hidden');
+                    const w = JSON.parse(d.candidates[0].content.parts[0].text);
+                    el.querySelector('.weather-city-name').textContent = w.city; el.querySelector('.weather-temp').textContent = w.temp; el.querySelector('.weather-condition').textContent = w.condition;
+                    el.querySelector('.weather-wind').textContent = w.wind; el.querySelector('.weather-humidity').textContent = w.humidity; el.querySelector('.weather-precip').textContent = w.precip; el.querySelector('.weather-icon-badge').textContent = w.iconEmoji || '☁️';
+                    el.querySelector('.weather-prompt-view').classList.add('hidden'); el.querySelector('.weather-stats-view').classList.remove('hidden');
+                    playSysSound('success');
+                } catch(e) { el.querySelector('.weather-loader').classList.add('hidden'); showNotification("Error", "Weather fetch failed", "error"); }
+            };
+            el.querySelector('.weather-change-city-btn').onclick = () => { el.querySelector('.weather-stats-view').classList.add('hidden'); el.querySelector('.weather-prompt-view').classList.remove('hidden'); };
+        }
+
+        function bootstrapSettings(el) {
+            const v = el.querySelectorAll('.settings-tab-view'), b = el.querySelectorAll('.settings-nav-btn');
+            
+            // Tab switching logic
+            b.forEach(btn => btn.onclick = (e) => {
+                b.forEach(x => { x.classList.remove('bg-white/5','border-purple-500','border-l-2','text-white'); x.classList.add('text-gray-400'); });
+                const t = e.currentTarget; t.classList.add('bg-white/5','border-purple-500','border-l-2','text-white'); t.classList.remove('text-gray-400');
+                v.forEach(x => x.classList.add('hidden')); el.querySelector(`#${t.dataset.tab}`).classList.remove('hidden');
+            });
+            
+            // Background Theme Changer
+            el.querySelectorAll('.settings-theme-btn').forEach(btn => btn.onclick = (e) => {
+                document.getElementById('desktop-env').style.backgroundImage = e.currentTarget.dataset.gradient; playSysSound('success');
+            });
+            
+            // WiFi Toggle & Dynamic List Builder
             const wifiToggle = el.querySelector('#settings-wifi-toggle');
             const wifiStatus = el.querySelector('#settings-wifi-status');
-            const wifiSsid = el.querySelector('#settings-wifi-ssid');
-            const networksList = el.querySelector('#settings-wifi-networks-list');
+            const listContainer = el.querySelector('#settings-wifi-networks-list');
 
-            const renderNetworks = () => {
-                networksList.innerHTML = '';
+            const virtualNetworks = [
+                { ssid: "Nebula_Cosmos_Net", signal: "📶", secure: true },
+                { ssid: "Andromeda_5G", signal: "📶", secure: true },
+                { ssid: "Orion_Space_Cloud", signal: "📶", secure: true },
+                { ssid: "Starbucks_WiFi", signal: "📶", secure: false },
+                { ssid: "Voyager_DeepSpace_7", signal: "📶", secure: true }
+            ];
+
+            const rebuildWiFiList = () => {
+                listContainer.innerHTML = '';
                 if (!isWifiSimConnected) {
-                    networksList.innerHTML = '<p class="text-xs text-gray-500">Wi-Fi is toggled off.</p>';
+                    listContainer.innerHTML = '<p class="text-xs text-gray-500 italic py-2">WiFi is toggled off.</p>';
                     return;
                 }
 
-                wifiNetworks.forEach(net => {
-                    const isActive = net === currentWifiSimSSID;
-                    const card = document.createElement('div');
-                    card.className = "flex justify-between items-center p-2.5 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 cursor-pointer text-xs";
-                    card.innerHTML = `
+                virtualNetworks.forEach(net => {
+                    const isConnected = net.ssid === currentWifiSimSSID;
+                    const netDiv = document.createElement('div');
+                    netDiv.className = `flex justify-between items-center p-2 rounded-xl border text-xs cursor-pointer transition-colors ${isConnected ? 'bg-purple-950/20 border-purple-500/40 text-white' : 'bg-white/5 border-white/5 text-gray-300 hover:bg-white/10'}`;
+                    netDiv.innerHTML = `
                         <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-wifi text-purple-400"></i>
-                            <span class="${isActive ? 'font-bold text-white' : 'text-gray-300'}">${net}</span>
+                            <span>${net.signal}</span>
+                            <span class="${isConnected ? 'font-bold' : ''}">${net.ssid}</span>
                         </div>
-                        ${isActive ? '<span class="text-[9px] bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded font-mono">Connected</span>' : ''}
+                        <span class="text-[9px] px-2 py-0.5 rounded font-mono ${isConnected ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-gray-400'}">
+                            ${isConnected ? 'Connected' : net.secure ? 'Secure' : 'Open'}
+                        </span>
                     `;
-                    card.addEventListener('click', async () => {
-                        if (isActive) return;
-                        const pwd = await sysPrompt(`Join network "${net}"`, "Enter security password:", "12345678");
-                        if (pwd) {
-                            currentWifiSimSSID = net;
-                            wifiSsid.textContent = `SSID: ${net}`;
-                            showNotification("Network Joined 📶", `Connection mapped with ${net}.`, "success");
-                            renderNetworks();
+
+                    netDiv.onclick = async () => {
+                        if (isConnected) return;
+                        if (net.secure) {
+                            const password = await sysPrompt(`Join "${net.ssid}"`, "Enter security key (8+ characters):", "nebula123");
+                            if (password) {
+                                currentWifiSimSSID = net.ssid;
+                                showNotification("WiFi Connected 📶", `Connection successfully mapped to ${net.ssid}`, "success");
+                                rebuildWiFiList();
+                            }
+                        } else {
+                            currentWifiSimSSID = net.ssid;
+                            showNotification("WiFi Connected 📶", `Joined open network ${net.ssid}`, "success");
+                            rebuildWiFiList();
                         }
-                    });
-                    networksList.appendChild(card);
+                    };
+                    listContainer.appendChild(netDiv);
                 });
             };
 
-            wifiToggle.addEventListener('change', (e) => {
+            wifiToggle.onchange = (e) => {
                 isWifiSimConnected = e.target.checked;
-                const trayWifi = document.getElementById('sys-wifi-icon');
-                if (isWifiSimConnected) {
-                    wifiStatus.textContent = "Connected";
-                    wifiStatus.className = "font-bold text-green-400";
-                    trayWifi.className = "fa-solid fa-wifi text-green-400 cursor-pointer hover:text-white transition-all";
-                    showNotification("Wi-Fi Active 📶", "Satellite links established.", "success");
-                } else {
-                    wifiStatus.textContent = "Disconnected";
-                    wifiStatus.className = "font-bold text-red-500";
-                    trayWifi.className = "fa-solid fa-wifi-slash text-red-500 cursor-pointer hover:text-white transition-all";
-                    showNotification("Wi-Fi Terminated", "Terminated external sockets.", "error");
-                }
-                renderNetworks();
-                playSysSound('click');
-            });
-
-            renderNetworks();
-
-            // Accounts registry views
-            const accountsList = el.querySelector('#settings-accounts-list');
-            const renderAccountsList = () => {
-                accountsList.innerHTML = '';
-                accountsRegistry.forEach(acc => {
-                    const isActive = acc === currentActiveUser;
-                    const card = document.createElement('div');
-                    card.className = "flex justify-between items-center p-2.5 bg-white/5 border border-white/5 rounded-xl text-xs";
-                    card.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 rounded-full bg-indigo-950 flex items-center justify-center font-bold text-indigo-300">👤</div>
-                            <span class="font-semibold text-gray-200">${acc}</span>
-                        </div>
-                        ${isActive ? '<span class="text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded font-semibold border border-purple-500/20">Current Profile</span>' : '<button class="switch-user-btn bg-white/10 hover:bg-white/15 px-2 py-1 rounded text-gray-200">Switch User</button>'}
-                    `;
-                    if (!isActive) {
-                        card.querySelector('.switch-user-btn').onclick = () => {
-                            currentActiveUser = acc;
-                            document.getElementById('start-profile-name').textContent = `${acc} 🚀`;
-                            showNotification("User Logged In 👽", `Logged in successfully as ${acc}.`, "success");
-                            renderAccountsList();
-                        };
-                    }
-                    accountsList.appendChild(card);
-                });
+                wifiStatus.textContent = isWifiSimConnected ? "Connected" : "Disconnected";
+                wifiStatus.className = isWifiSimConnected ? "font-bold text-green-400" : "font-bold text-red-500";
+                document.getElementById('sys-wifi-icon').className = isWifiSimConnected ? "fa-solid fa-wifi text-green-400 cursor-pointer hover:text-white transition-all" : "fa-solid fa-wifi-slash text-red-500 cursor-pointer hover:text-white transition-all";
+                rebuildWiFiList();
             };
 
-            el.querySelector('#add-account-btn').addEventListener('click', async () => {
-                const name = await sysPrompt("Add Account 👥", "Enter new username profile:", "John Doe");
-                if (name && name.trim()) {
-                    accountsRegistry.push(name.trim());
-                    renderAccountsList();
-                    showNotification("Account Registry", `Profile created for ${name.trim()}.`, "success");
-                }
+            rebuildWiFiList();
+
+            // Accent color selector hooks
+            el.querySelectorAll('.settings-accent-btn').forEach(accentBtn => {
+                accentBtn.onclick = (e) => {
+                    const btn = e.currentTarget;
+                    const accentColor = btn.dataset.color;
+                    const borderColor = btn.dataset.border;
+                    const textColor = btn.dataset.text;
+
+                    // Apply visual ring feedback
+                    el.querySelectorAll('.settings-accent-btn').forEach(b => b.classList.remove('border-white', 'ring-2', 'ring-purple-500'));
+                    btn.classList.add('border-white', 'ring-2', 'ring-purple-500');
+
+                    // Compile dynamic accent stylesheets
+                    let style = document.getElementById('dynamic-accent-style');
+                    if (!style) {
+                        style = document.createElement('style');
+                        style.id = 'dynamic-accent-style';
+                        document.head.appendChild(style);
+                    }
+                    style.innerHTML = `
+                        .accent-border { border-color: ${borderColor} !important; }
+                        .accent-bg { background-color: ${accentColor} !important; }
+                        .accent-text { color: ${textColor} !important; }
+                        .accent-shadow { box-shadow: 0 10px 15px -3px ${borderColor} !important; }
+                    `;
+                    playSysSound('success');
+                };
             });
 
-            renderAccountsList();
+            // CRT Scanline toggling
+            const scanlineToggle = el.querySelector('#settings-scanline-toggle');
+            if (scanlineToggle) {
+                const overlay = document.getElementById('scanline-overlay');
+                scanlineToggle.checked = overlay.classList.contains('scanline');
+                scanlineToggle.onchange = (e) => {
+                    if (e.target.checked) overlay.classList.add('scanline');
+                    else overlay.classList.remove('scanline');
+                };
+            }
+
+            // Window transparency control
+            const transparencySlider = el.querySelector('#settings-transparency-slider');
+            const transparencyLabel = el.querySelector('#transparency-val-lbl');
+            if (transparencySlider) {
+                transparencySlider.oninput = (e) => {
+                    const val = e.target.value;
+                    transparencyLabel.textContent = `${Math.round(val * 100)}%`;
+                    
+                    let style = document.getElementById('dynamic-glass-style');
+                    if (!style) {
+                        style = document.createElement('style');
+                        style.id = 'dynamic-glass-style';
+                        document.head.appendChild(style);
+                    }
+                    style.innerHTML = `
+                        .glass-window {
+                            background: rgba(18, 12, 38, ${val}) !important;
+                            backdrop-filter: blur(20px);
+                            -webkit-backdrop-filter: blur(20px);
+                            border: 1px solid rgba(255, 255, 255, 0.12);
+                            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+                        }
+                    `;
+                };
+            }
+
+            // Desktop shortcut scales sizing
+            const iconSizeSelect = el.querySelector('#settings-icon-size');
+            if (iconSizeSelect) {
+                iconSizeSelect.value = currentIconSize;
+                iconSizeSelect.onchange = (e) => {
+                    currentIconSize = e.target.value;
+                    renderDesktopIcons();
+                    playSysSound('click');
+                };
+            }
+
+            // Sound FX settings toggle
+            const audioToggle = el.querySelector('#settings-audio-toggle');
+            if (audioToggle) {
+                audioToggle.checked = isSoundFXEnabled;
+                audioToggle.onchange = (e) => {
+                    isSoundFXEnabled = e.target.checked;
+                    playSysSound('click');
+                };
+            }
+
+            // VFS Storage Monitor & Wipe Disk
+            const vfsProgress = el.querySelector('#settings-vfs-progress');
+            const vfsLabel = el.querySelector('#settings-vfs-count-lbl');
+            const updateVfsLabel = () => {
+                const totalFiles = (VFS['/'] || []).length + (VFS['/docs'] || []).length + (VFS['/drawings'] || []).length;
+                vfsLabel.textContent = `${totalFiles} record${totalFiles !== 1 ? 's' : ''} saved`;
+                const percentage = Math.min((totalFiles / 50) * 100, 100);
+                vfsProgress.style.width = `${percentage}%`;
+            };
+            updateVfsLabel();
+
+            el.querySelector('#settings-reset-vfs').onclick = () => {
+                VFS = { '/': [], '/docs': [], '/drawings': [] };
+                showNotification("Disk Storage Formatted", "Virtual directory cleaned back to baseline.", "info");
+                updateVfsLabel();
+                const explorer = openWindowsList.find(w => w.appId === 'explorer');
+                if (explorer) bootstrapExplorer(explorer.element);
+            };
         }
 
-        // ================= MATH CALCULATOR LOGIC =================
-        function bootstrapCalculator(el) {
-            const screen = el.querySelector('.calc-screen');
-            const history = el.querySelector('.calc-history');
-
-            let currentVal = "0";
-            let prevVal = "";
-            let operation = null;
-
-            el.querySelectorAll('.calc-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const action = e.target.dataset.action;
-                    const val = e.target.dataset.val;
-
-                    playSysSound('click');
-
-                    if (!action && val) {
-                        if (currentVal === "0" && val !== ".") {
-                            currentVal = val;
-                        } else {
-                            currentVal += val;
-                        }
-                        screen.textContent = currentVal;
-                    } else if (action === 'clear') {
-                        currentVal = "0";
-                        prevVal = "";
-                        operation = null;
-                        screen.textContent = currentVal;
-                        history.textContent = "";
-                    } else if (action === 'operator') {
-                        operation = e.target.dataset.val;
-                        prevVal = currentVal;
-                        currentVal = "0";
-                        history.textContent = `${prevVal} ${operation}`;
-                    } else if (action === 'equals') {
-                        if (!operation || !prevVal) return;
-                        let result;
-                        const p = parseFloat(prevVal);
-                        const c = parseFloat(currentVal);
-
-                        switch (operation) {
-                            case '+': result = p + c; break;
-                            case '-': result = p - c; break;
-                            case '*': result = p * c; break;
-                            case '/': result = c !== 0 ? p / c : "Error"; break;
-                        }
-
-                        history.textContent = `${prevVal} ${operation} ${currentVal} =`;
-                        currentVal = String(result);
-                        screen.textContent = currentVal;
-                        operation = null;
-                        prevVal = "";
-                    }
-                });
-            });
+        // Help prompt overlay wrapper
+        function sysPrompt(title, message, defaultValue = "") {
+            return sysDialog(title, message, true, defaultValue);
         }
     </script>
 </body>
